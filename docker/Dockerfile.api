@@ -1,0 +1,22 @@
+# Production Dockerfile for Fileway.Api
+# Full implementation added at Milestone 3 (LibreOffice integration)
+# See docs/architecture/13-libreoffice.md for the complete spec
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-bookworm-slim AS base
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim AS build
+WORKDIR /build
+COPY Directory.*.props ./
+COPY src/Fileway.Shared/Fileway.Shared.csproj src/Fileway.Shared/
+COPY src/Fileway.Api/Fileway.Api.csproj src/Fileway.Api/
+COPY src/Fileway.Client/Fileway.Client.csproj src/Fileway.Client/
+RUN dotnet restore src/Fileway.Api/Fileway.Api.csproj
+COPY src/ ./src/
+RUN dotnet publish src/Fileway.Api/Fileway.Api.csproj \
+    -c Release -r linux-x64 --no-self-contained -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+USER app
+ENTRYPOINT ["dotnet", "Fileway.Api.dll"]

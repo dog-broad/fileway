@@ -1,0 +1,48 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(grep:*)",
+      "Bash(sed:*)",
+      "Bash(echo:*)",
+      "Bash(chmod:*)",
+      "Bash(git:*)",
+      "Bash(libreoffice:*)",
+      "Bash(soffice:*)",
+      "Bash(apt-get list*)",
+      "Read(**)",
+      "Write(src/**)",
+      "Write(tests/**)",
+      "Write(tools/**)",
+      "Write(docs/**)",
+      "Write(.claude/**)",
+      "Write(docker/**)",
+      "Write(.github/**)",
+      "Write(Directory.Build.props)",
+      "Write(Directory.Packages.props)",
+      "Write(.editorconfig)",
+      "Write(.gitignore)",
+      "Write(Fileway.sln)",
+      "Write(README.md)",
+      "Write(CONTRIBUTING.md)",
+      "Write(SECURITY.md)",
+      "Write(LICENSE)",
+      "Write(CODE_OF_CONDUCT.md)"
+    ],
+    "deny": [
+      "Bash(apt-get install*)",
+      "Bash(apt-get remove*)",
+      "Bash(npm install*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(chmod 777:*)"
+    ]
+  }
+}
