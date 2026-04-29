@@ -1,7 +1,12 @@
 FROM mcr.microsoft.com/devcontainers/dotnet:1-9.0-bookworm
 
+# The base image ships with a Yarn apt source whose GPG key is expired.
+# Remove it before running apt-get update to prevent build failure.
+RUN rm -f /etc/apt/sources.list.d/yarn.list \
+    && rm -f /etc/apt/trusted.gpg.d/yarn.gpg \
+    || true
+
 # LibreOffice headless + fonts + rendering deps
-# Single RUN layer, apt lists deleted to keep image lean
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libreoffice-nogui \
     fonts-liberation \
@@ -10,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgdiplus \
     && rm -rf /var/lib/apt/lists/*
 
-# Node.js LTS
+# Node.js LTS via NodeSource (replaces the broken Yarn-bundled Node)
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
