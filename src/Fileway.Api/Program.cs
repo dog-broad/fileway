@@ -1,5 +1,6 @@
 using Fileway.Api.Configuration;
 using Fileway.Api.Infrastructure;
+using Fileway.Api.Jobs;
 using Fileway.Shared.Detection;
 using Fileway.Shared.Formats;
 using Fileway.Shared.Registry;
@@ -57,6 +58,13 @@ try
     ]));
 
     builder.Services.AddSingleton<IToolRegistry>(_ => new ToolRegistry(DataTools.All));
+
+    // --- Job model + storage ---
+    builder.Services.AddSingleton<IJobStore, InMemoryJobStore>();
+    builder.Services.AddSingleton<JobQueueManager>();
+    builder.Services.AddSingleton<IStorageService, LocalFileStorageService>();
+    builder.Services.AddScoped<JobDispatcher>();
+    builder.Services.AddHostedService<JobSweepService>();
 
     // --- Rate limiting ---
     builder.Services.AddFilewayRateLimiting(rateLimitOptions);

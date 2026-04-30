@@ -71,16 +71,16 @@
 
 > Read `docs/architecture/02-job-model.md` before starting this section.
 
-- [ ] Add `JobStatus` enum and `JobRecord.cs` to `Fileway.Api/Jobs/`
-- [ ] Add `IJobStore` interface and implement `InMemoryJobStore.cs` using `ConcurrentDictionary<Guid, JobRecord>`
-- [ ] Implement `JobSweepService` as `IHostedService` — every 5 min, delete completed/failed jobs older than 10 min; scan `/tmp/fileway/` for orphaned temp dirs older than 15 min
-- [ ] Implement `JobQueueManager` — enforces `MaxConcurrentJobs` (server-wide) and `MaxJobsPerSession`; returns 429 `ConcurrentJobLimit` or 503 `QueueFull`
-- [ ] Add `IStorageService` interface to `Fileway.Api/Infrastructure/`
-- [ ] Implement `LocalFileStorageService` — writes output to a configured temp dir, returns a local path; used in development and CI when R2 credentials are absent
-- [ ] Register `IStorageService` → `LocalFileStorageService` for now; M4 adds the R2 implementation behind a config flag
-- [ ] Implement `JobDispatcher` in `Fileway.Api/Jobs/` — ValidateOptions → check limits → create `JobRecord` → return JobId → background `Task` runs full lifecycle and emits SSE events via `Channel<JobEvent>` (ref: `04-processors.md`)
+- [x] Add `JobStatus` enum and `JobRecord.cs` to `Fileway.Api/Jobs/`
+- [x] Add `IJobStore` interface and implement `InMemoryJobStore.cs` using `ConcurrentDictionary<Guid, JobRecord>`
+- [x] Implement `JobSweepService` as `IHostedService` — every 5 min, delete completed/failed jobs older than 10 min; scan `/tmp/fileway/` for orphaned temp dirs older than 15 min
+- [x] Implement `JobQueueManager` — enforces `MaxConcurrentJobs` (server-wide) and `MaxJobsPerSession`; returns 429 `ConcurrentJobLimit` or 503 `QueueFull`
+- [x] Add `IStorageService` interface to `Fileway.Api/Infrastructure/`
+- [x] Implement `LocalFileStorageService` — writes output to a configured temp dir, returns a local path; used in development and CI when R2 credentials are absent
+- [x] Register `IStorageService` → `LocalFileStorageService` for now; M4 adds the R2 implementation behind a config flag
+- [x] Implement `JobDispatcher` in `Fileway.Api/Jobs/` — ValidateOptions → check limits → create `JobRecord` → return JobId → background `Task` runs full lifecycle and emits SSE events via `Channel<JobEvent>` (ref: `04-processors.md`)
   > The route handler calls `DispatchAsync()` and returns 202 immediately — the entire job lifecycle runs in a background `Task.Run`
-- [ ] **Checkpoint** — API restarts cleanly; startup logs contain no `NullReferenceException` or missing-service errors; `JobSweepService` start is visible in the log output
+- [x] **Checkpoint** — API restarts cleanly; startup logs contain no `NullReferenceException` or missing-service errors; `JobSweepService` start is visible in the log output
 
 ---
 
