@@ -2,6 +2,8 @@
 
 This file is the contract between you (Claude) and this project. Read it fully at the start of every session. Every decision referenced here has been planned and locked. Do not improvise architecture — consult the source of truth documents.
 
+> **Also read at session start:** `.claude/WORKFLOW.md` — branch strategy, commit protocol, pre-commit checklist, and session start procedure. Workflow rules are binding alongside the rules in this file.
+
 ---
 
 ## Project Identity
@@ -21,6 +23,8 @@ Every architectural decision lives in one of these files. When you are unsure ab
 
 | Document | Covers |
 |---|---|
+| `.claude/WORKFLOW.md` | Branch strategy, commit format, session protocol, pre-commit checklist, PR flow |
+| `PROGRESS.md` | Per-milestone step checklist — source of truth for what is done and what remains |
 | `docs/architecture/00-overview.md` | System map, project graph, milestone order, key decisions summary |
 | `docs/architecture/01-tool-registry.md` | ToolDefinition record, FileFormat, all enums, ToolRegistry query API |
 | `docs/architecture/02-job-model.md` | SSE, job lifecycle states, Channel pipe, two tiers, job store |
@@ -179,10 +183,11 @@ Do not proceed with new work until the deviation is resolved.
 
 At the start of every working session, before writing any code:
 
-1. Identify what you are building (which milestone, which tool, which layer)
-2. Read the relevant SoT document(s) for that domain
-3. Check if any existing code deviates from those documents
-4. Only then begin implementing
+1. Read `.claude/WORKFLOW.md` — confirm branch, run `git status`, orient against `git log --oneline -5`
+2. Read `PROGRESS.md` — identify the next unchecked section and confirm its scope
+3. Read the relevant SoT document(s) listed at the top of that section
+4. Check if any existing code deviates from those documents
+5. Only then begin implementing
 
 ---
 
