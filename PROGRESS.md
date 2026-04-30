@@ -12,24 +12,24 @@
 
 > Read `docs/architecture/01-tool-registry.md` before starting this section.
 
-- [ ] Add enums: `FormatCategory`, `ToolKind`, `ToolCategory`, `ProcessorKind`, `JobTier`, `PreviewKind`, `UiHints` — one enum per file in `Fileway.Shared/Formats/` and `Fileway.Shared/Tools/`
-- [ ] Add `MagicSignature` record to `Fileway.Shared/Formats/MagicSignature.cs`
-- [ ] Add `FileFormat` record to `Fileway.Shared/Formats/FileFormat.cs`
-- [ ] Add M1 `FileFormat` instances to `Fileway.Shared/Formats/FileFormats.cs`: json, yaml, csv, toml, xlsx, txt, md
+- [x] Add enums: `FormatCategory`, `ToolKind`, `ToolCategory`, `ProcessorKind`, `JobTier`, `PreviewKind`, `UiHints` — one enum per file in `Fileway.Shared/Formats/` and `Fileway.Shared/Tools/`
+- [x] Add `MagicSignature` record to `Fileway.Shared/Formats/MagicSignature.cs`
+- [x] Add `FileFormat` record to `Fileway.Shared/Formats/FileFormat.cs`
+- [x] Add M1 `FileFormat` instances to `Fileway.Shared/Formats/FileFormats.cs`: json, yaml, csv, toml, xlsx, txt, md
   > JSON/YAML/CSV/TOML/MD have `CanBeDetected = false` and use `DetectionHints` only — no magic bytes (ref: `06-detection.md`)
-- [ ] Add `ToolDefinition` record to `Fileway.Shared/Tools/ToolDefinition.cs`
-- [ ] Add `ToolLimits` record to `Fileway.Shared/Tools/ToolLimits.cs`
-- [ ] Create `Fileway.Shared/Tools/Definitions/DataTools.cs` with all 5 data tool `ToolDefinition` records
+- [x] Add `ToolDefinition` record to `Fileway.Shared/Tools/ToolDefinition.cs`
+- [x] Add `ToolLimits` record to `Fileway.Shared/Tools/ToolLimits.cs`
+- [x] Create `Fileway.Shared/Tools/Definitions/DataTools.cs` with all 5 data tool `ToolDefinition` records
   > `ProcessorType` is null for WasmOnly tools; set it to `typeof(CsvToXlsxProcessor)` only for the csv-to-xlsx API fallback path
-- [ ] Create `Fileway.Shared/Registry/ToolRegistry.cs` with all query methods (ref: `01-tool-registry.md`)
+- [x] Create `Fileway.Shared/Registry/ToolRegistry.cs` with all query methods (ref: `01-tool-registry.md`)
   > ToolRegistry is a singleton built once at startup from a fixed list — it does not scan assemblies
-- [ ] Add all error code string constants to `Fileway.Shared/Errors/ErrorCodes.cs` — every error code from the taxonomy (ref: `03-api-surface.md`)
-- [ ] Add exception classes to `Fileway.Shared/Errors/`: `ProcessorValidationException`, `ProcessorDomainException`, `ProcessorUnexpectedException`
-- [ ] Add `IApiProcessor` and `IWasmProcessor` interfaces to `Fileway.Shared/Processors/`
-- [ ] Add `ProcessorContext`, `InputFile`, `ProcessorResult`, `ProcessorProgressEvent` records to `Fileway.Shared/Processors/`
-- [ ] Add SSE/job wire types to `Fileway.Shared/Jobs/`: `JobEvent`, `SyncJobResult`, `AsyncJobResult`, `FailedPayload`, `SitemapEntry`
-- [ ] Add `ToolSummary` record to `Fileway.Shared/Tools/ToolSummary.cs` — the slimmed-down API response type for `GET /api/v1/tools`; omits `ProcessorType`, `ProgressStages`, `UiHints`, and internal fields (ref: `03-api-surface.md`)
-- [ ] Add `JobOptions` record to `Fileway.Shared/Jobs/JobOptions.cs` — deserialised from the `options` multipart part; fields: `ToolSlug`, `OutputFormat`, `InlineContent`, `ToolOptions` as `JsonElement` (ref: `03-api-surface.md`)
+- [x] Add all error code string constants to `Fileway.Shared/Errors/ErrorCodes.cs` — every error code from the taxonomy (ref: `03-api-surface.md`)
+- [x] Add exception classes to `Fileway.Shared/Errors/`: `ProcessorValidationException`, `ProcessorDomainException`, `ProcessorUnexpectedException`
+- [x] Add `IApiProcessor` and `IWasmProcessor` interfaces to `Fileway.Shared/Processors/`
+- [x] Add `ProcessorContext`, `InputFile`, `ProcessorResult`, `ProcessorProgressEvent` records to `Fileway.Shared/Processors/`
+- [x] Add SSE/job wire types: `JobEvent` + `JobEventType` to `Fileway.Shared/Jobs/`; `FailedPayload` to `Jobs/Payloads/`; `SyncJobResult` + `AsyncJobAccepted` to `Fileway.Shared/Api/`; `SitemapEntry` to `Fileway.Shared/Registry/`
+- [x] Add `ToolSummary` record to `Fileway.Shared/Tools/ToolSummary.cs` — the slimmed-down API response type for `GET /api/v1/tools`; omits `ProcessorType`, `ProgressStages`, `UiHints`, and internal fields (ref: `03-api-surface.md`)
+- [x] Add `JobOptions` record to `Fileway.Shared/Api/JobOptions.cs` — deserialised from the `options` multipart part; fields: `ToolSlug`, `OutputFormat`, `InlineContent`, `ToolOptions` as `JsonElement` (ref: `03-api-surface.md`)
 
 ---
 
