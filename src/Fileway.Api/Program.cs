@@ -68,6 +68,10 @@ try
     builder.Services.AddScoped<JobDispatcher>();
     builder.Services.AddHostedService<JobSweepService>();
 
+    // --- Processors ---
+    builder.Services.AddApiProcessors();
+    builder.Services.AddHostedService<ProcessorSanityCheck>();
+
     // --- Logging ---
     builder.Services.AddSingleton<AuditLogService>();
 
@@ -96,6 +100,10 @@ try
     // -----------------------------------------------------------------------
 
     var app = builder.Build();
+
+    // Second-pass: populate ProcessorType on ToolDefinition records from the DI mapping.
+    // Must run before ProcessorSanityCheck (which is an IHostedService that starts with app.Run()).
+    app.InitializeProcessorTypes();
 
     // --- Middleware pipeline (order is required by spec) ---
 

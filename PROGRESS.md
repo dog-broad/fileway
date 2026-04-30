@@ -101,11 +101,11 @@
 
 > Read `docs/architecture/04-processors.md` before starting this section.
 
-- [ ] Create `Fileway.Api/Infrastructure/ProcessorExtensions.cs` — explicit `services.AddTransient<T>()` per processor, no scanning
-- [ ] Implement `ProcessorSanityCheck` as `IHostedService` — crashes startup with `InvalidOperationException` on any misconfiguration; runs before the server begins accepting requests (ref: `04-processors.md`)
+- [x] Create `Fileway.Api/Infrastructure/ProcessorExtensions.cs` — explicit `services.AddTransient<T>()` per processor, no scanning
+- [x] Implement `ProcessorSanityCheck` as `IHostedService` — crashes startup with `InvalidOperationException` on any misconfiguration; runs before the server begins accepting requests (ref: `04-processors.md`)
   > Intentionally fatal — do not add try/catch; loud failure at startup prevents silent misconfiguration in production
-- [ ] Add API-side `ToolRegistry` second-pass initialisation at startup — after DI is configured, iterate all non-WasmOnly `ToolDefinition` records and populate their `ProcessorType` field from the DI container; `ProcessorType` is null in the shared definition and only set on the API side (ref: `04-processors.md`)
-- [ ] **Checkpoint** — API startup logs show `SanityCheckPassed` event; if `SanityCheckFailed` appears instead, stop and fix before proceeding — the server will not accept requests
+- [x] Add API-side `ToolRegistry` second-pass initialisation at startup — after DI is configured, iterate all non-WasmOnly `ToolDefinition` records and populate their `ProcessorType` field from the DI container; `ProcessorType` is null in the shared definition and only set on the API side (ref: `04-processors.md`)
+- [x] **Checkpoint** — API startup logs show `SanityCheckPassed` event; if `SanityCheckFailed` appears instead, stop and fix before proceeding — the server will not accept requests
 
 ---
 
