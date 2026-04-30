@@ -50,20 +50,20 @@
 
 > Read `docs/architecture/03-api-surface.md`, `docs/architecture/10-observability.md`, and `docs/architecture/11-rate-limiting.md` before starting this section.
 
-- [ ] Configure Serilog with compact JSON formatter to stdout in `Fileway.Api/Program.cs`; `Information` in production, `Debug` in development via `appsettings.json`
-- [ ] Add `ApiOptions` strongly-typed config class to `Fileway.Api/Config/` covering all concurrency and timeout values from `02-job-model.md`
-- [ ] Add stub config classes: `LibreOfficeOptions`, `StorageOptions` — needed at startup even if unused until M4
-- [ ] Implement session token middleware: validate `X-Session-Token` as UUID → 400 if missing/invalid; compute `ipHash = SHA-256(rawIp + dailySalt)` for rate limit keying
+- [x] Configure Serilog with compact JSON formatter to stdout in `Fileway.Api/Program.cs`; `Information` in production, `Debug` in development via `appsettings.json`
+- [x] Add `ApiOptions` strongly-typed config class to `Fileway.Api/Configuration/` covering all concurrency and timeout values from `02-job-model.md`
+- [x] Add stub config classes: `LibreOfficeOptions`, `StorageOptions`, `RateLimitOptions` — needed at startup even if unused until M4
+- [x] Implement session token middleware: validate `X-Session-Token` as UUID → 400 if missing/invalid; compute `ipHash = SHA-256(rawIp + dailySalt)` for rate limit keying
   > Log only the first 8 chars of the token as `sessionPrefix` — never the full token (ref: `10-observability.md`)
-- [ ] Configure security headers middleware (CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
-- [ ] Configure CORS — `fileway.io` and `localhost` only, no wildcard
-- [ ] Add `ITierResolver` interface and `AlwaysFreeTierResolver` stub to `Fileway.Api/Infrastructure/`
-- [ ] Configure `Microsoft.AspNetCore.RateLimiting` with session-token policy (20 req/60s) and IP-hash policy (60 req/60s), both calling `ITierResolver` (ref: `11-rate-limiting.md`)
-- [ ] Configure global 200MB request size limit via `KestrelServerOptions` or `IFormOptions`
-- [ ] Configure `ProblemDetails` exception handler middleware — catches all unhandled exceptions → 500; never leaks stack traces
-- [ ] Register `ToolRegistry` singleton in API DI
-- [ ] Add health endpoints: `GET /health/live` and `GET /health/ready` via `app.MapHealthChecks()`
-- [ ] **Checkpoint** — `dotnet run --project src/Fileway.Api` starts without exception; `curl http://localhost:5000/health/live` and `/health/ready` both return 200; startup logs contain no error-level events
+- [x] Configure security headers middleware (CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
+- [x] Configure CORS — `fileway.io` and `localhost` only, no wildcard
+- [x] Add `ITierResolver` interface and `AlwaysFreeTierResolver` stub to `Fileway.Api/Infrastructure/`
+- [x] Configure `Microsoft.AspNetCore.RateLimiting` with session-token policy (20 req/60s) and IP-hash policy (60 req/60s), both calling `ITierResolver` (ref: `11-rate-limiting.md`)
+- [x] Configure global 200MB request size limit via `KestrelServerOptions` or `IFormOptions`
+- [x] Configure `ProblemDetails` exception handler middleware — catches all unhandled exceptions → 500; never leaks stack traces
+- [x] Register `ToolRegistry` singleton in API DI
+- [x] Add health endpoints: `GET /health/live` and `GET /health/ready` via `app.MapHealthChecks()`
+- [x] **Checkpoint** — `dotnet run --project src/Fileway.Api` starts without exception; `curl http://localhost:5006/health/live` and `/health/ready` both return 200; startup logs contain no error-level events
 
 ---
 
