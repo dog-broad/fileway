@@ -1,8 +1,14 @@
+using Fileway.Shared.Detection;
+using Fileway.Shared.Formats;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddSingleton<IFormatDetector>(_ => new FormatDetector([
+    FileFormats.Json, FileFormats.Yaml, FileFormats.Csv, FileFormats.Toml,
+    FileFormats.Xlsx, FileFormats.Txt, FileFormats.Md
+]));
 
 var app = builder.Build();
 

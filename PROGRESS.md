@@ -37,12 +37,12 @@
 
 > Read `docs/architecture/06-detection.md` before starting this section.
 
-- [ ] Add `DetectionConfidence` enum and `IFormatDetector` interface to `Fileway.Shared/Detection/`
-- [ ] Implement `FormatDetector.cs` in `Fileway.Shared/Detection/` — three-pass pipeline: magic bytes, ZIP disambiguation, text heuristics
+- [x] Add `DetectionConfidence` enum and `IFormatDetector` interface to `Fileway.Shared/Detection/`
+- [x] Implement `FormatDetector.cs` in `Fileway.Shared/Detection/` — three-pass pipeline: magic bytes, ZIP disambiguation, text heuristics
   > Magic byte comparison must apply `MagicSignature.Mask` via AND before comparing; null mask means compare directly
-- [ ] Implement Pass 2 ZIP disambiguation for XLSX in M1 — after a ZIP magic byte match, scan the central directory for `[Content_Types].xml` + `xl/` to identify XLSX; needed now because xlsx is the csv-to-xlsx output format (ref: `06-detection.md`)
-- [ ] Register `IFormatDetector` / `FormatDetector` as a singleton in both API and WASM `Program.cs`
-- [ ] Ensure `FormatDetector` has zero I/O or platform dependencies — it must compile to WASM unchanged
+- [x] Implement Pass 2 ZIP disambiguation for XLSX in M1 — scans ZIP local file entry headers (at start of file) for `[Content_Types].xml` + `xl/`; central directory scanning deferred until M3 when DOCX/PPTX are added
+- [x] Register `IFormatDetector` / `FormatDetector` as a singleton in both API and WASM `Program.cs`
+- [x] Ensure `FormatDetector` has zero I/O or platform dependencies — it must compile to WASM unchanged
 
 ---
 
