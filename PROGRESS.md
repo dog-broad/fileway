@@ -86,14 +86,14 @@
 
 ### API Endpoints
 
-- [ ] Implement `POST /api/v1/jobs` in `Fileway.Api/Endpoints/JobEndpoints.cs` following the exact validation order from `03-api-surface.md`
+- [x] Implement `POST /api/v1/jobs` in `Fileway.Api/Endpoints/JobEndpoints.cs` following the exact validation order from `03-api-surface.md`
   > Read the `options` multipart part before touching any file bytes — part order in multipart is required by the spec
-- [ ] Implement `GET /api/v1/jobs/{jobId}/progress` SSE endpoint — reads `Channel<JobEvent>.Reader`, sends `: ping\n\n` keepalive every 15s, handles `Last-Event-ID` reconnect replay, returns 403/404 where appropriate
-- [ ] Implement `GET /api/v1/tools` — returns `ToolSummary[]`, supports `category` and `q` query params, sets `Cache-Control: public, max-age=3600` + `ETag`
-- [ ] Implement `GET /api/v1/tools/{slug}` — resolves via `ToolRegistry.GetBySlug()`, returns 404 if null
-- [ ] Implement `POST /api/v1/detect` — calls `IFormatDetector.Detect()` on received header bytes; returns detected format, confidence, and suggested tool slugs
-- [ ] Add `AuditLogService` to `Fileway.Api/Logging/` — writes conversion audit events with no filenames, no file content, no raw IPs (ref: `10-observability.md`)
-- [ ] **Checkpoint** — `curl http://localhost:5000/api/v1/tools` returns a JSON array with exactly 5 objects and correct slugs; `curl -X POST http://localhost:5000/api/v1/jobs` with no body returns 400 with a JSON `ProblemDetails` response body — not 500 and not plain text
+- [x] Implement `GET /api/v1/jobs/{jobId}/progress` SSE endpoint — reads `Channel<JobEvent>.Reader`, sends `: ping\n\n` keepalive every 15s, handles `Last-Event-ID` reconnect replay, returns 403/404 where appropriate
+- [x] Implement `GET /api/v1/tools` — returns `ToolSummary[]`, supports `category` and `q` query params, sets `Cache-Control: public, max-age=3600` + `ETag`
+- [x] Implement `GET /api/v1/tools/{slug}` — resolves via `ToolRegistry.GetBySlug()`, returns 404 if null
+- [x] Implement `POST /api/v1/detect` — calls `IFormatDetector.Detect()` on received header bytes; returns detected format, confidence, and suggested tool slugs
+- [x] Add `AuditLogService` to `Fileway.Api/Logging/` — writes conversion audit events with no filenames, no file content, no raw IPs (ref: `10-observability.md`)
+- [x] **Checkpoint** — `GET /api/v1/tools` returns a JSON array with exactly 5 objects and correct slugs; `POST /api/v1/jobs` with no body returns 400 with a JSON `ProblemDetails` response body — not 500 and not plain text
 
 ---
 

@@ -1,6 +1,8 @@
 using Fileway.Api.Configuration;
+using Fileway.Api.Endpoints;
 using Fileway.Api.Infrastructure;
 using Fileway.Api.Jobs;
+using Fileway.Api.Logging;
 using Fileway.Shared.Detection;
 using Fileway.Shared.Formats;
 using Fileway.Shared.Registry;
@@ -66,6 +68,9 @@ try
     builder.Services.AddScoped<JobDispatcher>();
     builder.Services.AddHostedService<JobSweepService>();
 
+    // --- Logging ---
+    builder.Services.AddSingleton<AuditLogService>();
+
     // --- Rate limiting ---
     builder.Services.AddFilewayRateLimiting(rateLimitOptions);
 
@@ -118,6 +123,9 @@ try
     // --- Endpoints ---
     app.MapHealthChecks("/health/live").DisableRateLimiting();
     app.MapHealthChecks("/health/ready").DisableRateLimiting();
+    app.MapToolEndpoints();
+    app.MapDetectEndpoints();
+    app.MapJobEndpoints();
 
     app.Run();
 }
