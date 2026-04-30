@@ -109,6 +109,30 @@ docs(progress): mark shared-types section complete
 
 ---
 
+## Checkpoint Protocol
+
+Each PROGRESS.md section ends with a `**Checkpoint**` item. No section commit is provided until its checkpoint passes.
+
+### How to handle a checkpoint
+
+**If Claude can run it directly** (e.g. `curl`, `dotnet test`, `grep`, file existence checks, `docker` commands):
+- Run it, show the output, confirm it passes before moving on
+
+**If it requires a browser or manual action** (DevTools inspection, drag interactions, visual confirmation):
+- State clearly what the developer needs to do and what a passing result looks like
+- Wait for confirmation before marking the checkpoint `[x]` or providing the commit command
+
+**If a checkpoint fails:**
+- Stop — do not provide a commit command for a section whose checkpoint did not pass
+- Fix the failing issue as a `fix(<scope>)` change bundled into the same section commit (not a separate commit) if the section is otherwise complete
+- Re-run the checkpoint after fixing; only then provide the commit command
+
+**Marking state:**
+- Mark the checkpoint `[~]` while it is being verified
+- Mark it `[x]` only after it passes — never speculatively
+
+---
+
 ## Bug Fix Protocol
 
 If a bug is found after a section commit — whether discovered during the next section or by a test failure:
