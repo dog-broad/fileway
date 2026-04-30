@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Fileway.Api.Configuration;
 using Fileway.Api.Endpoints;
 using Fileway.Api.Infrastructure;
@@ -80,6 +81,10 @@ try
 
     // --- Health checks ---
     builder.Services.AddHealthChecks();
+
+    // --- JSON serialization — enums as strings ---
+    builder.Services.ConfigureHttpJsonOptions(options =>
+        options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
     // --- ProblemDetails ---
     builder.Services.AddProblemDetails();

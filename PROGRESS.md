@@ -111,9 +111,9 @@
 
 ### Data Format Processors (API)
 
-- [ ] Implement `CsvToXlsxProcessor` in `Fileway.Api/Processors/DataFormats/` using `CsvHelper` + `ClosedXML` — this is the API fallback for the `WasmPreferred` csv-to-xlsx tool
-- [ ] Register `CsvToXlsxProcessor` in `ProcessorExtensions.cs`
-- [ ] **Checkpoint** — POST a small CSV with `X-Session-Token` header and `toolSlug: "csv-to-xlsx"` to `/api/v1/jobs` as multipart; response is 200 with `deliveryKind: "Inline"` and non-empty `inlineContent`
+- [x] Implement `CsvToXlsxProcessor` in `Fileway.Api/Processors/DataFormats/` using `CsvHelper` + `ClosedXML` — this is the API fallback for the `WasmPreferred` csv-to-xlsx tool
+- [x] Register `CsvToXlsxProcessor` in `ProcessorExtensions.cs`
+- [x] **Checkpoint** — POST a small CSV with `X-Session-Token` header and `toolSlug: "csv-to-xlsx"` to `/api/v1/jobs` as multipart; response is 200 with `deliveryKind: "Inline"` and non-empty `inlineContent`
 
 ---
 
