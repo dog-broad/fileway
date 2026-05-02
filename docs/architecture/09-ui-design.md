@@ -105,7 +105,24 @@ Defined in `app.css` under both `[data-theme]` blocks. One pair per format:
 | `--format-{id}-bg` | Soft background (low opacity tint) |
 | `--format-{id}-fg` | Foreground — icon, label, and border color |
 
-Current formats: `json` (amber), `yaml` (violet), `csv` (emerald), `toml` (sky), `xlsx` (teal).
+**Complete V1 format identity plan** (tokens + icon branch added when the format is registered in `FileFormats.cs`):
+
+| Format | Color family | Rationale | Milestone |
+|---|---|---|---|
+| `json` | Amber `#fbbf24` | Warm, ubiquitous | M1 ✓ |
+| `yaml` | Violet `#a78bfa` | Structured config | M1 ✓ |
+| `csv` | Emerald `#34d399` | Tabular data | M1 ✓ |
+| `toml` | Sky `#38bdf8` | Config, Rust-adjacent | M1 ✓ |
+| `xlsx` | Teal `#2dd4bf` | Excel-adjacent | M1 ✓ |
+| `txt` | Zinc `#a1a1aa` | Plain, unformatted | M1 (no tool yet) |
+| `md` | Purple `#c084fc` | Docs, Markdown hash | M4 |
+| `pdf` | Red `#f87171` | Adobe brand | M3 |
+| `png` | Rose `#fb7185` | Lossless raster | M2 |
+| `jpg` | Orange `#fb923c` | Photographic warmth | M2 |
+| `webp` | Lime `#a3e635` | Modern, Google | M2 |
+| `gif` | Fuchsia `#e879f9` | Animated | M2 |
+| `svg` | Indigo `#818cf8` | Vector, precise | M2 |
+| `docx` | Blue `#60a5fa` | Word brand | M4 |
 
 Fallback when a format has no tokens: `color-mix(in srgb, var(--color-accent) 12%, transparent)` for bg, `var(--color-accent)` for fg.
 
@@ -113,14 +130,27 @@ Fallback when a format has no tokens: `color-mix(in srgb, var(--color-accent) 12
 
 `FormatIcon.razor` — renders a 24×24-viewBox SVG whose paths encode the format's **structure**, not a logo:
 
-| Format | Icon concept |
-|---|---|
-| `json` | Curly braces `{ }` |
-| `yaml` | Three staggered lines — YAML's indented hierarchy |
-| `csv` | 3×3 table grid |
-| `toml` | `[ ]` bracket wrapping key=value lines |
-| `xlsx` | Spreadsheet grid with filled header row |
-| fallback | Generic file icon |
+| Format | Icon concept | Milestone |
+|---|---|---|
+| `json` | Curly braces `{ }` | M1 ✓ |
+| `yaml` | Three staggered-indent lines | M1 ✓ |
+| `csv` | 3×3 table grid | M1 ✓ |
+| `toml` | `[ ]` bracket wrapping key=value lines | M1 ✓ |
+| `xlsx` | Spreadsheet grid with filled header row | M1 ✓ |
+| `txt` | Three plain horizontal lines | M1 |
+| `md` | `#` hash symbol (two vertical + two horizontal bars) | M4 |
+| `pdf` | Document with fold + two content lines | M3 |
+| `png` | Raster image frame — mountain + circle | M2 |
+| `jpg` | Same raster frame — color differentiates | M2 |
+| `webp` | Same raster frame — color differentiates | M2 |
+| `gif` | Same raster frame — color differentiates | M2 |
+| `svg` | Two anchor points with a bezier curve between them | M2 |
+| `docx` | Document with fold + three text lines | M4 |
+| fallback | Generic file icon | always |
+
+**Raster image formats** (`png`, `jpg`, `webp`, `gif`) intentionally share the same icon path — the tint color is the primary differentiator, and the format label in the badge makes it unambiguous. This is semantically honest: all four ARE raster images.
+
+**SVG** gets a distinct icon (bezier curve with anchor dots) because it is structurally different from raster formats.
 
 Parameters: `FormatId` (string, required), `Width` (int, default 16).
 
@@ -148,9 +178,13 @@ Parameter `Size`: `BadgeSize.Sm` (20px, 12px icon) · `Md` (24px, 14px icon) · 
 
 ### Adding a New Format
 
-1. Add `--format-{id}-bg` and `--format-{id}-fg` tokens to both themes in `app.css`
-2. Add an `else if (FormatId == "{id}")` branch to `FormatIcon.razor` with the icon paths
-3. The badge and pair components pick up the new format automatically via the inline variable pattern
+When a new `FileFormat` is registered in `FileFormats.cs`, follow this checklist to give it visual identity:
+
+1. Look up the format's planned color in the table above — do not invent a new color without updating the table
+2. Add `--format-{id}-bg` and `--format-{id}-fg` tokens to **both** themes in `app.css`
+3. Add an `else if (FormatId == "{id}")` branch to `FormatIcon.razor` with the icon paths from the table above
+4. The badge and pair components pick up the new format automatically via the inline variable pattern
+5. No other files need changes — `FormatBadge` and `ConversionPair` are generic
 
 ---
 
