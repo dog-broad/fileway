@@ -1,0 +1,18 @@
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-md);
+    transition: color 0.15s, background-color 0.15s;
+    flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-primary);
+}

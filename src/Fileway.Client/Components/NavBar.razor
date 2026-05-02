@@ -1,0 +1,18 @@
+@using Fileway.Client.Services
+@inject ThemeService ThemeService
+
+<header class="navbar">
+    <nav class="navbar-inner" aria-label="Main navigation">
+        <a href="/" class="navbar-logo" aria-label="Fileway home">
+            <span class="navbar-logo-text">Fileway</span>
+        </a>
+
+        <ul class="navbar-links" role="list">
+            <li><a href="/tools?category=Data" class="navbar-link">Data</a></li>
+        </ul>
+
+        <div class="navbar-actions">
+            <ThemeToggle />
+        </div>
+    </nav>
+</header>

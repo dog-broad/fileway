@@ -157,13 +157,13 @@
 
 > Read `docs/architecture/09-ui-design.md` before starting this section.
 
-- [ ] Add all CSS custom property tokens (colours, spacing, radius, typography) to `Fileway.Client/wwwroot/css/app.css` under both `[data-theme="dark"]` and `[data-theme="light"]` selectors
+- [x] Add all CSS custom property tokens (colours, spacing, radius, typography) to `Fileway.Client/wwwroot/css/app.css` under both `[data-theme="dark"]` and `[data-theme="light"]` selectors
   > No hex values in any component `.razor.css` file — only `var(--token-name)`; full token list in `09-ui-design.md`
-- [ ] Self-host Inter and JetBrains Mono fonts — add to `wwwroot/fonts/`, declare via `@font-face` in `app.css`; no Google Fonts CDN
-- [ ] Add `App.razor` with Blazor Router and 404 fallback
-- [ ] Add `MainLayout.razor` — CSS grid/flex layout using design tokens, includes `<NavBar>` and `<main>`
-- [ ] Add `NavBar.razor` — logo, category nav links, `<ThemeToggle>` — mobile-first, fully responsive from 375px
-- [ ] Add `ThemeToggle.razor` — calls `ThemeService.Toggle()` on click, reflects current theme state
+- [x] Self-host Inter and JetBrains Mono fonts — add to `wwwroot/fonts/`, declare via `@font-face` in `app.css`; no Google Fonts CDN
+- [x] Add `App.razor` with Blazor Router and 404 fallback
+- [x] Add `MainLayout.razor` — CSS grid/flex layout using design tokens, includes `<NavBar>` and `<main>`
+- [x] Add `NavBar.razor` — logo, category nav links, `<ThemeToggle>` — mobile-first, fully responsive from 375px
+- [x] Add `ThemeToggle.razor` — calls `ThemeService.Toggle()` on click, reflects current theme state
 - [ ] **Checkpoint** — App loads; inspect `<html>` in DevTools and confirm `data-theme` is set before Blazor hydrates (theme applies without flash); clicking ThemeToggle switches the attribute and a page refresh retains the choice
 
 ---
