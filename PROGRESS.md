@@ -121,21 +121,21 @@
 
 > Read `docs/architecture/02-job-model.md` and `docs/architecture/04-processors.md` before starting this section.
 
-- [ ] Implement `SseClient.js` in `Fileway.Client/wwwroot/js/` — wraps browser `EventSource`, forwards messages via `DotNet.invokeMethodAsync`, exposes `open(url)` and `close()` methods; no business logic
+- [x] Implement `SseClient.js` in `Fileway.Client/wwwroot/js/` — wraps browser `EventSource`, forwards messages via `DotNet.invokeMethodAsync`, exposes `open(url)` and `close()` methods; no business logic
   > Blazor WASM has no native `EventSource` — this JS bridge is the only way to consume SSE (ref: `02-job-model.md`)
-- [ ] Implement `SseClient.cs` in `Fileway.Client/Interop/` — wraps JS interop, deserialises JSON strings to typed `JobEvent` records, exposes `IAsyncEnumerable<JobEvent>`, registered as Scoped DI
-- [ ] Implement `ApiJobClient.cs` in `Fileway.Client/Services/` — builds multipart POST to `/api/v1/jobs`, handles sync (200) and async (202) responses, exposes `Retry-After` header value for error countdown
-- [ ] Implement `ProcessorRouter` in `Fileway.Client/Services/` — routes WasmOnly/ApiOnly/WasmPreferred; falls back to API on `ProcessorUnexpectedException` from WASM with "Switching to server…" indicator (ref: `04-processors.md`)
-- [ ] Implement `DetectionService.cs` in `Fileway.Client/Services/` — wraps `IFormatDetector`, called on file drop, surfaces confidence to DropZone; falls back to `POST /api/v1/detect` when WASM detection returns Low confidence or null
+- [x] Implement `SseClient.cs` in `Fileway.Client/Interop/` — wraps JS interop, deserialises JSON strings to typed `JobEvent` records, exposes `IAsyncEnumerable<JobEvent>`, registered as Scoped DI
+- [x] Implement `ApiJobClient.cs` in `Fileway.Client/Services/` — builds multipart POST to `/api/v1/jobs`, handles sync (200) and async (202) responses, exposes `Retry-After` header value for error countdown
+- [x] Implement `ProcessorRouter` in `Fileway.Client/Services/` — routes WasmOnly/ApiOnly/WasmPreferred; falls back to API on `ProcessorUnexpectedException` from WASM with "Switching to server…" indicator (ref: `04-processors.md`)
+- [x] Implement `DetectionService.cs` in `Fileway.Client/Services/` — wraps `IFormatDetector`, called on file drop, surfaces confidence to DropZone; falls back to `POST /api/v1/detect` when WASM detection returns Low confidence or null
   > The server `/api/v1/detect` endpoint is the authoritative fallback — even if WASM says Unknown, the server can identify via the same magic byte logic (ref: `06-detection.md`)
-- [ ] Add session token initialisation to WASM `Program.cs` — generate UUID v4 if absent from `sessionStorage`, persist there; `ApiJobClient` reads it and adds it as `X-Session-Token` on every request
+- [x] Add session token initialisation to WASM `Program.cs` — generate UUID v4 if absent from `sessionStorage`, persist there; `ApiJobClient` reads it and adds it as `X-Session-Token` on every request
   > Use `sessionStorage`, not `localStorage` — tab-scoped by design; token disappears on tab close (ref: `03-api-surface.md`)
-- [ ] Implement `ToolStateService` in `Fileway.Client/Services/` as a Scoped DI service — tracks per-tab state machine (Idle → Submitting → Processing → Completed | Failed); `SseClient.cs` calls into it on each event; `ProgressPanel` and `ErrorPanel` read from it (ref: `07-error-model.md`)
-- [ ] Create `Fileway.Client/Infrastructure/WasmProcessorExtensions.cs` — per-processor `AddTransient<>` + slug→`Type` dictionary entry
-- [ ] Implement `ThemeInterop.js` in `Fileway.Client/wwwroot/js/` — reads/writes `[data-theme]` on `<html>`, persists preference to `localStorage`
+- [x] Implement `ToolStateService` in `Fileway.Client/Services/` as a Scoped DI service — tracks per-tab state machine (Idle → Submitting → Processing → Completed | Failed); `SseClient.cs` calls into it on each event; `ProgressPanel` and `ErrorPanel` read from it (ref: `07-error-model.md`)
+- [x] Create `Fileway.Client/Infrastructure/WasmProcessorExtensions.cs` — per-processor `AddTransient<>` + slug→`Type` dictionary entry
+- [x] Implement `ThemeInterop.js` in `Fileway.Client/wwwroot/js/` — reads/writes `[data-theme]` on `<html>`, persists preference to `localStorage`
   > Load this script *before* `blazor.webassembly.js` in `index.html` to prevent flash of unstyled content
-- [ ] Implement `ThemeService.cs` in `Fileway.Client/Services/` — exposes `Toggle()`, delegates to `ThemeInterop.js` via JS interop
-- [ ] **Checkpoint** — App loads in browser with no console errors; DevTools → Application → Session Storage shows a UUID under `sessionToken`; DevTools → Network shows `X-Session-Token` header present on any request to `/api/v1/tools`
+- [x] Implement `ThemeService.cs` in `Fileway.Client/Services/` — exposes `Toggle()`, delegates to `ThemeInterop.js` via JS interop
+- [x] **Checkpoint** — App loads in browser with no console errors; DevTools → Application → Session Storage shows a UUID under `sessionToken`; DevTools → Network shows `X-Session-Token` header present on any request to `/api/v1/tools`
 
 ---
 

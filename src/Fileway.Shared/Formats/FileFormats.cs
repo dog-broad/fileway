@@ -113,4 +113,9 @@ public static class FileFormats
         IsTextBased = true,
         PreviewKind = PreviewKind.SyntaxHighlight
     };
+
+    public static readonly IReadOnlyList<FileFormat> All =
+    [
+        Json, Yaml, Csv, Toml, Xlsx, Txt, Md
+    ];
 }

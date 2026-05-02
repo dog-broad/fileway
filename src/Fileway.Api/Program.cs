@@ -98,7 +98,11 @@ try
                 "http://localhost:5000",
                 "https://localhost:5001",
                 "http://localhost:5001",
-                "https://localhost:7001")
+                "https://localhost:7001",
+                "http://localhost:5233",
+                "https://localhost:7257",
+                "http://127.0.0.1:5233",
+                "https://127.0.0.1:7257")
             .AllowAnyHeader()
             .AllowAnyMethod()));
 
