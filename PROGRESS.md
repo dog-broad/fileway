@@ -164,7 +164,7 @@
 - [x] Add `MainLayout.razor` — CSS grid/flex layout using design tokens, includes `<NavBar>` and `<main>`
 - [x] Add `NavBar.razor` — logo, category nav links, `<ThemeToggle>` — mobile-first, fully responsive from 375px
 - [x] Add `ThemeToggle.razor` — calls `ThemeService.Toggle()` on click, reflects current theme state
-- [ ] **Checkpoint** — App loads; inspect `<html>` in DevTools and confirm `data-theme` is set before Blazor hydrates (theme applies without flash); clicking ThemeToggle switches the attribute and a page refresh retains the choice
+- [x] **Checkpoint** — App loads; inspect `<html>` in DevTools and confirm `data-theme` is set before Blazor hydrates (theme applies without flash); clicking ThemeToggle switches the attribute and a page refresh retains the choice
 
 ---
 
@@ -172,18 +172,18 @@
 
 > Read `docs/architecture/09-ui-design.md` before starting this section. Every component has its own `.razor.css` scoped stylesheet.
 
-- [ ] Add `DropZone.razor` — file drop target; calls `DetectionService` on drop; tap-to-browse fallback via `<input type="file">`; shows format name or "couldn't identify" text
+- [x] Add `DropZone.razor` — file drop target; calls `DetectionService` on drop; tap-to-browse fallback via `<input type="file">`; shows format name or "couldn't identify" text
   > Drag-and-drop must always have a keyboard/tap fallback — no hover-only interaction (WCAG 2.5.5)
-- [ ] Add `ErrorMessages.cs` to `Fileway.Client/Components/Errors/` with all error code → (userMessage, suggestedAction, retryable) mappings (ref: `07-error-model.md`)
-- [ ] Add `ErrorPanel.razor` — renders `userMessage` + `suggestedAction`; shows "Try again" button on retryable; shows `RelatedSlugs` chips on non-retryable; shows live countdown on `RateLimitExceeded` using `Retry-After` value
-- [ ] Add `ProgressPanel.razor` — stage name, `stageIndex`/`stageTotalCount`, overall percent bar; wrap progress announcements in an ARIA live region
-- [ ] Add `SyntaxHighlightPreview.razor` — syntax-highlighted output for JSON/YAML/CSV/TOML
-- [ ] Add `InlineEditorPreview.razor` — split-pane editor for data tools where `RequiresFileInput = false`
-- [ ] Add `PreviewPanel.razor` — reads `InputPreviewKind`/`OutputPreviewKind` from `ToolDefinition` and renders the matching preview sub-component; no per-tool conditional logic here
-- [ ] Add `ToolOptionsPanel.razor` — reads `UiHints` flags and conditionally renders sub-components; M1 data tools require no sub-components
-- [ ] Add `ToolCard.razor` — used on `/tools` listing page; shows `DisplayName`, `ShortDescription`, "New"/"Popular" badge if set
-- [ ] Add `OutputFormatSelector.razor` — renders a format picker (dropdown or button group) from `ToolDefinition.OutputFormats`; pre-selects `DefaultOutputFormat`; hidden when there is only one output format
-- [ ] Add `OutputPanel.razor` — shown when `ToolStateService` reaches Completed; triggers browser download for signed URL (`window.location.href`) or saves inline base64 via JS interop; shows copy-to-clipboard button for text outputs (JSON/YAML/CSV/TOML)
+- [x] Add `ErrorMessages.cs` to `Fileway.Client/Components/Errors/` with all error code → (userMessage, suggestedAction, retryable) mappings (ref: `07-error-model.md`)
+- [x] Add `ErrorPanel.razor` — renders `userMessage` + `suggestedAction`; shows "Try again" button on retryable; shows `RelatedSlugs` chips on non-retryable; shows live countdown on `RateLimitExceeded` using `Retry-After` value
+- [x] Add `ProgressPanel.razor` — stage name, `stageIndex`/`stageTotalCount`, overall percent bar; wrap progress announcements in an ARIA live region
+- [x] Add `SyntaxHighlightPreview.razor` — syntax-highlighted output for JSON/YAML/CSV/TOML
+- [x] Add `InlineEditorPreview.razor` — split-pane editor for data tools where `RequiresFileInput = false`
+- [x] Add `PreviewPanel.razor` — reads `InputPreviewKind`/`OutputPreviewKind` from `ToolDefinition` and renders the matching preview sub-component; no per-tool conditional logic here
+- [x] Add `ToolOptionsPanel.razor` — reads `UiHints` flags and conditionally renders sub-components; M1 data tools require no sub-components
+- [x] Add `ToolCard.razor` — used on `/tools` listing page; shows `DisplayName`, `ShortDescription`, "New"/"Popular" badge if set
+- [x] Add `OutputFormatSelector.razor` — renders a format picker (dropdown or button group) from `ToolDefinition.OutputFormats`; pre-selects `DefaultOutputFormat`; hidden when there is only one output format
+- [x] Add `OutputPanel.razor` — shown when `ToolStateService` reaches Completed; triggers browser download for signed URL (`window.location.href`) or saves inline base64 via JS interop; shows copy-to-clipboard button for text outputs (JSON/YAML/CSV/TOML)
 - [ ] **Checkpoint** — Drop a `.json` file on the DropZone: format chip shows "JSON"; drop an unrecognised file: "couldn't identify" text appears with no crash; manually trigger `ErrorPanel` with a known `errorCode` and confirm the copy matches `ErrorMessages.cs` exactly
 
 ---

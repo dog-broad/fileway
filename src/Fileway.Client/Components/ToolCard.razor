@@ -1,0 +1,22 @@
+@using Fileway.Shared.Tools
+
+<a href="/tools/@Tool.Slug" class="tool-card">
+    <div class="tool-card-header">
+        <span class="tool-card-name">@Tool.DisplayName</span>
+        <div class="tool-card-badges">
+            @if (Tool.IsNew)
+            {
+                <span class="badge badge-new">New</span>
+            }
+            @if (Tool.IsPopular)
+            {
+                <span class="badge badge-popular">Popular</span>
+            }
+        </div>
+    </div>
+    <p class="tool-card-description">@Tool.ShortDescription</p>
+</a>
+
+@code {
+    [Parameter, EditorRequired] public ToolDefinition Tool { get; set; } = null!;
+}

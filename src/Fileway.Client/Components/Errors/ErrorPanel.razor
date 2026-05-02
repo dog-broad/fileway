@@ -1,0 +1,98 @@
+@using Fileway.Client.Services
+@using Fileway.Shared.Errors
+
+@if (_show)
+{
+    <div class="error-panel" role="alert" aria-live="assertive">
+        <div class="error-panel-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+        </div>
+        <div class="error-panel-body">
+            <p class="error-message">@_userMessage</p>
+            @if (_suggestedAction is not null)
+            {
+                <p class="error-suggestion">@_suggestedAction</p>
+            }
+            @if (ErrorCode == ErrorCodes.RateLimitExceeded && _countdown > 0)
+            {
+                <p class="error-countdown" aria-live="polite">Try again in @_countdown s</p>
+            }
+        </div>
+        <div class="error-panel-actions">
+            @if (IsRetryable && ErrorCode != ErrorCodes.RateLimitExceeded)
+            {
+                <button class="btn-retry" @onclick="HandleRetry">Try again</button>
+            }
+            else if (IsRetryable && ErrorCode == ErrorCodes.RateLimitExceeded)
+            {
+                <button class="btn-retry" @onclick="HandleRetry" disabled="@(_countdown > 0)">
+                    @(_countdown > 0 ? $"Try again in {_countdown}s" : "Try again")
+                </button>
+            }
+            @if (RelatedSlugs is { Length: > 0 } && !IsRetryable)
+            {
+                <div class="error-related">
+                    <span class="error-related-label">Try instead:</span>
+                    @foreach (var slug in RelatedSlugs)
+                    {
+                        <a href="/tools/@slug" class="related-chip">@slug</a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string? ErrorCode { get; set; }
+    [Parameter] public string? FallbackMessage { get; set; }
+    [Parameter] public string? FallbackSuggestion { get; set; }
+    [Parameter] public bool IsRetryable { get; set; }
+    [Parameter] public string[]? RelatedSlugs { get; set; }
+    [Parameter] public int? RetryAfterSeconds { get; set; }
+    [Parameter] public EventCallback OnRetry { get; set; }
+
+    private string _userMessage = string.Empty;
+    private string? _suggestedAction;
+    private bool _show;
+    private int _countdown;
+    private System.Threading.Timer? _timer;
+
+    protected override void OnParametersSet()
+    {
+        _show = ErrorCode is not null || FallbackMessage is not null;
+        if (!_show) return;
+
+        var entry = ErrorMessages.Get(ErrorCode);
+        _userMessage = entry?.UserMessage ?? FallbackMessage ?? "An error occurred.";
+        _suggestedAction = entry?.SuggestedAction ?? FallbackSuggestion;
+
+        if (ErrorCode == Fileway.Shared.Errors.ErrorCodes.RateLimitExceeded && RetryAfterSeconds > 0)
+            StartCountdown(RetryAfterSeconds!.Value);
+    }
+
+    private void StartCountdown(int seconds)
+    {
+        _countdown = seconds;
+        _timer?.Dispose();
+        _timer = new System.Threading.Timer(_ =>
+        {
+            if (_countdown > 0) _countdown--;
+            InvokeAsync(StateHasChanged);
+        }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+    }
+
+    private async Task HandleRetry()
+    {
+        _timer?.Dispose();
+        _countdown = 0;
+        await OnRetry.InvokeAsync();
+    }
+
+    public void Dispose() => _timer?.Dispose();
+}

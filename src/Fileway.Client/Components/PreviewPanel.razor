@@ -1,0 +1,20 @@
+@using Fileway.Shared.Formats
+
+@switch (PreviewKind)
+{
+    case PreviewKind.SyntaxHighlight:
+        <SyntaxHighlightPreview Content="@Content" Format="@Format" />
+        break;
+    case PreviewKind.InlineEditor:
+        @* InlineEditor is rendered by the tool page directly — not via PreviewPanel *@
+        break;
+    case PreviewKind.None:
+    default:
+        break;
+}
+
+@code {
+    [Parameter] public PreviewKind PreviewKind { get; set; }
+    [Parameter] public string? Content { get; set; }
+    [Parameter] public FileFormat? Format { get; set; }
+}

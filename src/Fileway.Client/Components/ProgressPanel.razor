@@ -1,0 +1,26 @@
+@if (IsVisible)
+{
+    <div class="progress-panel" role="status" aria-live="polite" aria-label="Conversion progress">
+        <div class="progress-header">
+            <span class="progress-stage">@(Stage ?? "Processing…")</span>
+            @if (StageTotalCount > 1)
+            {
+                <span class="progress-stage-count" aria-label="Stage @(StageIndex + 1) of @StageTotalCount">
+                    @(StageIndex + 1) / @StageTotalCount
+                </span>
+            }
+        </div>
+        <div class="progress-bar-track" role="progressbar"
+             aria-valuenow="@OverallPercent" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar-fill" style="width: @(OverallPercent)%"></div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public string? Stage { get; set; }
+    [Parameter] public int StageIndex { get; set; }
+    [Parameter] public int StageTotalCount { get; set; }
+    [Parameter] public int OverallPercent { get; set; }
+}

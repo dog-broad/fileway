@@ -1,0 +1,39 @@
+.format-selector {
+    display: inline-flex;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--color-bg-secondary);
+}
+
+.format-btn {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 var(--space-4);
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: none;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    transition: color 0.15s, background-color 0.15s;
+    border-right: 1px solid var(--color-border);
+}
+
+.format-btn:last-child {
+    border-right: none;
+}
+
+.format-btn:hover {
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-primary);
+}
+
+.format-btn.active {
+    background-color: var(--color-accent);
+    color: #fff;
+}
+
+.format-btn.active:hover {
+    background-color: var(--color-accent-hover);
+}

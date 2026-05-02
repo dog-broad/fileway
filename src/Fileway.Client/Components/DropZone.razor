@@ -1,0 +1,86 @@
+@using Fileway.Client.Services
+@using Fileway.Shared.Detection
+@using Fileway.Shared.Formats
+@inject DetectionService DetectionService
+
+<label class="dropzone @(_hasFile ? "has-file" : "")"
+       aria-label="File drop zone — click to browse or drag and drop a file">
+    <InputFile OnChange="HandleFile" class="dropzone-input" aria-label="Choose file" />
+    <div class="dropzone-body" aria-hidden="true">
+        @if (_detecting)
+        {
+            <span class="dropzone-status">Detecting format…</span>
+        }
+        else if (_detectedFormat is not null)
+        {
+            <div class="dropzone-detected">
+                <span class="format-chip">@_detectedFormat.DisplayName</span>
+                <span class="file-name">@_fileName</span>
+            </div>
+        }
+        else if (_scanned)
+        {
+            <div class="dropzone-detected">
+                <span class="format-unknown">Couldn't identify format</span>
+                <span class="file-name">@_fileName</span>
+            </div>
+        }
+        else
+        {
+            <div class="dropzone-prompt">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <span>Drop a file here or <span class="browse-link">browse</span></span>
+            </div>
+        }
+    </div>
+</label>
+
+@code {
+    [Parameter] public EventCallback<DropZoneFile> OnFileSelected { get; set; }
+
+    private bool _detecting;
+    private bool _scanned;
+    private bool _hasFile;
+    private FileFormat? _detectedFormat;
+    private string? _fileName;
+
+    private async Task HandleFile(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        _fileName = file.Name;
+        _scanned = false;
+        _detecting = true;
+        _hasFile = true;
+        StateHasChanged();
+
+        try
+        {
+            const long maxBytes = 50 * 1024 * 1024;
+            using var stream = file.OpenReadStream(maxBytes);
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            var content = ms.ToArray();
+
+            var (format, confidence) = await DetectionService.DetectAsync(content, file.Name);
+            _detectedFormat = format;
+            _scanned = true;
+
+            await OnFileSelected.InvokeAsync(new DropZoneFile(
+                file.Name, file.Size, content, format, confidence));
+        }
+        catch
+        {
+            _scanned = true;
+            _detectedFormat = null;
+        }
+        finally
+        {
+            _detecting = false;
+        }
+    }
+}

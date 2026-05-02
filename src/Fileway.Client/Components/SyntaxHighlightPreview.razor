@@ -1,0 +1,28 @@
+@using Fileway.Shared.Formats
+
+@if (!string.IsNullOrEmpty(Content))
+{
+    <div class="syntax-preview">
+        <div class="syntax-preview-header">
+            @if (Format is not null)
+            {
+                <span class="syntax-format-badge">@Format.DisplayName</span>
+            }
+        </div>
+        <pre class="syntax-pre @LangClass" tabindex="0"><code>@Content</code></pre>
+    </div>
+}
+
+@code {
+    [Parameter] public string? Content { get; set; }
+    [Parameter] public FileFormat? Format { get; set; }
+
+    private string LangClass => Format?.Id switch
+    {
+        "json" => "lang-json",
+        "yaml" => "lang-yaml",
+        "csv"  => "lang-csv",
+        "toml" => "lang-toml",
+        _      => string.Empty
+    };
+}

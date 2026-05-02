@@ -1,0 +1,62 @@
+.tool-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: border-color 0.15s, background-color 0.15s;
+    min-height: 80px;
+}
+
+.tool-card:hover {
+    border-color: var(--color-accent);
+    background-color: color-mix(in srgb, var(--color-accent) 4%, var(--color-bg-secondary));
+    text-decoration: none;
+}
+
+.tool-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.tool-card-name {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+}
+
+.tool-card-badges {
+    display: flex;
+    gap: var(--space-1);
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    height: 18px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-medium);
+}
+
+.badge-new {
+    background-color: color-mix(in srgb, var(--color-accent) 15%, transparent);
+    color: var(--color-accent);
+}
+
+.badge-popular {
+    background-color: color-mix(in srgb, var(--color-success) 15%, transparent);
+    color: var(--color-success);
+}
+
+.tool-card-description {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}

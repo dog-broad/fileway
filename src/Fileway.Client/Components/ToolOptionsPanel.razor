@@ -1,0 +1,31 @@
+@using Fileway.Shared.Tools
+
+@* M1: all data tools have UiHints.None — nothing to render.
+   Future milestones add sub-components here keyed on UiHints flags. *@
+@if (UiHints != UiHints.None)
+{
+    @if (UiHints.HasFlag(UiHints.ShowQualitySlider))
+    {
+        <p class="options-placeholder">Quality slider (M2)</p>
+    }
+    @if (UiHints.HasFlag(UiHints.ShowDimensionInputs))
+    {
+        <p class="options-placeholder">Dimension inputs (M2)</p>
+    }
+    @if (UiHints.HasFlag(UiHints.ShowPageSelector))
+    {
+        <p class="options-placeholder">Page selector (M3)</p>
+    }
+    @if (UiHints.HasFlag(UiHints.ShowOrderableList))
+    {
+        <p class="options-placeholder">Page editor (M3)</p>
+    }
+    @if (UiHints.HasFlag(UiHints.ShowSplitControls))
+    {
+        <p class="options-placeholder">Split controls (M3)</p>
+    }
+}
+
+@code {
+    [Parameter] public UiHints UiHints { get; set; } = UiHints.None;
+}

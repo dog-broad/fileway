@@ -1,0 +1,96 @@
+@using Fileway.Shared.Formats
+
+<div class="inline-editor">
+    <div class="inline-editor-pane">
+        <div class="pane-header">
+            <span class="pane-label">Input</span>
+            @if (DetectedFormat is not null)
+            {
+                <span class="format-chip">@DetectedFormat.DisplayName</span>
+            }
+        </div>
+        <textarea class="pane-textarea"
+                  placeholder="@Placeholder"
+                  value="@InputText"
+                  @oninput="HandleInput"
+                  aria-label="Input text"
+                  spellcheck="false">
+        </textarea>
+    </div>
+
+    <div class="inline-editor-divider" aria-hidden="true">
+        <button class="convert-btn"
+                @onclick="HandleConvert"
+                disabled="@(IsConverting || string.IsNullOrWhiteSpace(InputText))"
+                title="Convert"
+                aria-label="Convert">
+            @if (IsConverting)
+            {
+                <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                    <line x1="12" y1="2" x2="12" y2="6"/>
+                    <line x1="12" y1="18" x2="12" y2="22"/>
+                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/>
+                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+                    <line x1="2" y1="12" x2="6" y2="12"/>
+                    <line x1="18" y1="12" x2="22" y2="12"/>
+                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/>
+                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+                </svg>
+            }
+            else
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <polyline points="12 5 19 12 12 19"/>
+                </svg>
+            }
+        </button>
+    </div>
+
+    <div class="inline-editor-pane">
+        <div class="pane-header">
+            <span class="pane-label">Output</span>
+            @if (OutputFormat is not null)
+            {
+                <span class="format-chip">@OutputFormat.DisplayName</span>
+            }
+        </div>
+        <div class="pane-output">
+            @if (!string.IsNullOrEmpty(OutputText))
+            {
+                <SyntaxHighlightPreview Content="@OutputText" Format="@OutputFormat" />
+            }
+            else
+            {
+                <p class="output-placeholder">Output will appear here</p>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? InputText { get; set; }
+    [Parameter] public EventCallback<string> OnInputChanged { get; set; }
+    [Parameter] public EventCallback<string> OnConvert { get; set; }
+    [Parameter] public string? OutputText { get; set; }
+    [Parameter] public FileFormat? DetectedFormat { get; set; }
+    [Parameter] public FileFormat? OutputFormat { get; set; }
+    [Parameter] public bool IsConverting { get; set; }
+    [Parameter] public string Placeholder { get; set; } = "Paste or type your content here…";
+
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        var text = e.Value?.ToString() ?? string.Empty;
+        await OnInputChanged.InvokeAsync(text);
+    }
+
+    private async Task HandleConvert()
+    {
+        if (!string.IsNullOrWhiteSpace(InputText))
+            await OnConvert.InvokeAsync(InputText);
+    }
+}

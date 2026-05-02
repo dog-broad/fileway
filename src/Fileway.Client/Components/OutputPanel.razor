@@ -1,0 +1,97 @@
+@using Fileway.Client.Services
+@using Fileway.Shared.Api
+@using Fileway.Shared.Formats
+@inject IJSRuntime JS
+
+@if (IsVisible && Result is not null)
+{
+    <div class="output-panel">
+        <div class="output-panel-header">
+            <div class="output-meta">
+                @if (OutputFormat is not null)
+                {
+                    <span class="output-format-badge">@OutputFormat.DisplayName</span>
+                }
+                <span class="output-size">@FormatSize(Result.OutputSizeBytes)</span>
+            </div>
+            <div class="output-actions">
+                @if (_isTextOutput && !string.IsNullOrEmpty(_textContent))
+                {
+                    <button class="btn-secondary @(_copied ? "copied" : "")"
+                            @onclick="HandleCopy"
+                            aria-label="Copy to clipboard">
+                        @(_copied ? "Copied!" : "Copy")
+                    </button>
+                }
+                <button class="btn-primary" @onclick="HandleDownload" aria-label="Download file">
+                    Download
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public SyncJobResult? Result { get; set; }
+    [Parameter] public FileFormat? OutputFormat { get; set; }
+
+    private bool _copied;
+    private bool _isTextOutput;
+    private string? _textContent;
+
+    protected override void OnParametersSet()
+    {
+        if (Result is null) return;
+        _isTextOutput = OutputFormat?.IsTextBased == true;
+        if (_isTextOutput && Result.DeliveryKind == DeliveryKind.Inline && Result.InlineContent is not null)
+        {
+            try
+            {
+                var bytes = Convert.FromBase64String(Result.InlineContent);
+                _textContent = System.Text.Encoding.UTF8.GetString(bytes);
+            }
+            catch { _textContent = null; }
+        }
+    }
+
+    private async Task HandleDownload()
+    {
+        if (Result is null) return;
+
+        if (Result.DeliveryKind == DeliveryKind.Inline && Result.InlineContent is not null)
+        {
+            var filename = OutputFormat is not null
+                ? $"output.{OutputFormat.Extensions[0]}"
+                : "output";
+            var mimeType = OutputFormat?.MimeTypes.FirstOrDefault() ?? "application/octet-stream";
+            await JS.InvokeVoidAsync("ClientInterop.downloadBase64", filename, mimeType, Result.InlineContent);
+        }
+        else if (Result.DeliveryKind == DeliveryKind.SignedUrl && Result.SignedUrl is not null)
+        {
+            await JS.InvokeVoidAsync("window.open", Result.SignedUrl, "_blank");
+        }
+    }
+
+    private async Task HandleCopy()
+    {
+        if (_textContent is null) return;
+        try
+        {
+            await JS.InvokeVoidAsync("ClientInterop.copyText", _textContent);
+            _copied = true;
+            StateHasChanged();
+            await Task.Delay(2000);
+            _copied = false;
+            StateHasChanged();
+        }
+        catch { }
+    }
+
+    private static string FormatSize(long bytes)
+    {
+        if (bytes < 1024) return $"{bytes} B";
+        if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
+        return $"{bytes / (1024.0 * 1024):F1} MB";
+    }
+}

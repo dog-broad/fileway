@@ -19,6 +19,7 @@ public sealed class ToolStateService
     public string? ErrorCode { get; private set; }
     public string? ErrorMessage { get; private set; }
     public bool IsRetryable { get; private set; }
+    public int? RetryAfterSeconds { get; private set; }
     public int OverallPercent { get; private set; }
     public string? CurrentStage { get; private set; }
     public int StageIndex { get; private set; }
@@ -57,12 +58,13 @@ public sealed class ToolStateService
         NotifyStateChanged();
     }
 
-    public void Fail(string? errorCode, string? message, bool retryable)
+    public void Fail(string? errorCode, string? message, bool retryable, int? retryAfterSeconds = null)
     {
         State = ToolState.Failed;
         ErrorCode = errorCode;
         ErrorMessage = message;
         IsRetryable = retryable;
+        RetryAfterSeconds = retryAfterSeconds;
         NotifyStateChanged();
     }
 
@@ -100,6 +102,7 @@ public sealed class ToolStateService
         ErrorCode = null;
         ErrorMessage = null;
         IsRetryable = false;
+        RetryAfterSeconds = null;
         OverallPercent = 0;
         CurrentStage = null;
         StageIndex = 0;
