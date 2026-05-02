@@ -149,6 +149,8 @@
 - [x] Implement `CsvToXlsxProcessor` (WASM path) in `Fileway.Client/Processors/DataFormats/` using `ClosedXML`
   > ClosedXML 0.104.1 compiles to WASM without issues — `CanHandleSize` uses the 5 MB threshold from `DataTools.CsvToXlsx`
 - [x] Register all WASM data processors in `WasmProcessorExtensions.cs`
+- [x] Add `ToolExample` record to `Fileway.Shared/Tools/ToolExample.cs`; add `Examples` field to `ToolDefinition`; populate 2 realistic examples per data tool in `DataTools.cs` (ref: `01-tool-registry.md`)
+  > Every new `RequiresFileInput = false` tool must include at least one example — see rules in `01-tool-registry.md`
 - [ ] **Checkpoint** — Navigate to `/tools/json-to-yaml`; enter `{"key": "value"}`; output pane shows `key: value`; navigate to `/tools/validate`; enter `{invalid`; `ErrorPanel` shows the malformed-JSON copy from `ErrorMessages.cs`
 
 ---
@@ -178,7 +180,7 @@
 - [x] Add `ErrorPanel.razor` — renders `userMessage` + `suggestedAction`; shows "Try again" button on retryable; shows `RelatedSlugs` chips on non-retryable; shows live countdown on `RateLimitExceeded` using `Retry-After` value
 - [x] Add `ProgressPanel.razor` — stage name, `stageIndex`/`stageTotalCount`, overall percent bar; wrap progress announcements in an ARIA live region
 - [x] Add `SyntaxHighlightPreview.razor` — syntax-highlighted output for JSON/YAML/CSV/TOML
-- [x] Add `InlineEditorPreview.razor` — split-pane editor for data tools where `RequiresFileInput = false`
+- [x] Add `InlineEditorPreview.razor` — split-pane editor for data tools where `RequiresFileInput = false`; renders example chips in the input pane header when `ToolDefinition.Examples` is non-empty; clicking a chip loads the content and auto-converts
 - [x] Add `PreviewPanel.razor` — reads `InputPreviewKind`/`OutputPreviewKind` from `ToolDefinition` and renders the matching preview sub-component; no per-tool conditional logic here
 - [x] Add `ToolOptionsPanel.razor` — reads `UiHints` flags and conditionally renders sub-components; M1 data tools require no sub-components
 - [x] Add `ToolCard.razor` — used on `/tools` listing page; shows `DisplayName`, `ShortDescription`, "New"/"Popular" badge if set

@@ -104,6 +104,28 @@ The tool registry is the single source of truth for every tool in the app. Every
 | `RelatedSlugs` | `string[]` | "Also try" panel after conversion. Order matters. |
 | `SuggestionWeight` | `int` | Detection-driven suggestions. Higher = shown first. |
 
+### Examples
+
+| Field | Type | Notes |
+|---|---|---|
+| `Examples` | `ToolExample[]` | Not required. Default is empty. Only relevant for `RequiresFileInput = false` tools. |
+
+**`ToolExample` record** (`Fileway.Shared/Tools/ToolExample.cs`):
+
+| Field | Type | Notes |
+|---|---|---|
+| `Label` | `string` | Short name shown on the chip: "Service config", "Sales orders". Max ~20 chars. |
+| `Input` | `string` | The full example text. Should be realistic — non-trivial nesting and field variety. |
+
+Examples appear as chips in the input pane header. Clicking one loads the content into the editor and triggers conversion immediately, giving users a live before/after demo without typing anything.
+
+**Rules:**
+- Examples must be valid input for the tool — they will auto-convert on click.
+- For bidirectional tools (JSON↔YAML, JSON↔CSV), supply examples in the primary input format (the `DefaultOutputFormat`'s counterpart).
+- For `json-to-csv`, examples **must** be flat JSON arrays — nested objects will hit `JsonNotCsvCompatible`.
+- Target 2 examples per tool. One domain (configs, ops) + one data (records, events) is the pattern.
+- Every new `RequiresFileInput = false` tool added to the registry must include at least one example.
+
 ---
 
 ## Enums

@@ -1,4 +1,5 @@
 @using Fileway.Shared.Formats
+@using Fileway.Shared.Tools
 
 <div class="inline-editor">
     <div class="inline-editor-pane">
@@ -7,6 +8,20 @@
             @if (DetectedFormat is not null)
             {
                 <span class="format-chip">@DetectedFormat.DisplayName</span>
+            }
+            @if (Examples is { Length: > 0 })
+            {
+                <div class="example-chips">
+                    @foreach (var example in Examples)
+                    {
+                        var ex = example;
+                        <button class="example-chip"
+                                @onclick="() => LoadExample(ex)"
+                                title="Load @ex.Label example">
+                            @ex.Label
+                        </button>
+                    }
+                </div>
             }
         </div>
         <CodeMirrorEditor
@@ -79,6 +94,7 @@
     [Parameter] public FileFormat? OutputFormat { get; set; }
     [Parameter] public bool IsConverting { get; set; }
     [Parameter] public string Placeholder { get; set; } = "Paste or type your content here…";
+    [Parameter] public ToolExample[]? Examples { get; set; }
 
     private async Task HandleInput(string text)
     {
@@ -89,5 +105,12 @@
     {
         if (!string.IsNullOrWhiteSpace(InputText))
             await OnConvert.InvokeAsync(InputText);
+    }
+
+    private async Task LoadExample(ToolExample example)
+    {
+        var trimmed = example.Input.Trim();
+        await OnInputChanged.InvokeAsync(trimmed);
+        await OnConvert.InvokeAsync(trimmed);
     }
 }

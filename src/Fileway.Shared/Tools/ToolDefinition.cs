@@ -50,4 +50,7 @@ public sealed record ToolDefinition
     // Suggestion engine
     public required string[] RelatedSlugs { get; init; }
     public required int SuggestionWeight { get; init; }
+
+    // Examples
+    public ToolExample[] Examples { get; init; } = [];
 }
