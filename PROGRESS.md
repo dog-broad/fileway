@@ -190,10 +190,10 @@
 
 ### Tool Pages
 
-- [ ] Add `/tools` listing page (`Fileway.Client/Pages/ToolsPage.razor`) — calls `ToolRegistry.GetAll()`, groups by category, renders `<ToolCard>` per tool; supports `?category=` and `?q=` query params
-- [ ] Add generic tool page (`Fileway.Client/Pages/ToolPage.razor`) at route `/tools/{slug}` — resolves `ToolDefinition`, renders `<DropZone>` (or `<InlineEditorPreview>` when `RequiresFileInput = false`), `<OutputFormatSelector>`, `<ToolOptionsPanel>`, `<PreviewPanel>`, `<ProgressPanel>`, `<ErrorPanel>`, `<OutputPanel>`
+- [x] Add `/tools` listing page (`Fileway.Client/Pages/ToolsPage.razor`) — calls `ToolRegistry.GetAll()`, groups by category, renders `<ToolCard>` per tool; supports `?category=` and `?q=` query params
+- [x] Add generic tool page (`Fileway.Client/Pages/ToolPage.razor`) at route `/tools/{slug}` — resolves `ToolDefinition`, renders `<DropZone>` (or `<InlineEditorPreview>` when `RequiresFileInput = false`), `<OutputFormatSelector>`, `<ToolOptionsPanel>`, `<PreviewPanel>`, `<ProgressPanel>`, `<ErrorPanel>`, `<OutputPanel>`
   > The tool page never knows which preview or options sub-component is shown — everything is driven by `ToolDefinition.UiHints`, `InputPreviewKind`, `OutputPreviewKind`; `<OutputPanel>` is only visible when `ToolStateService.State == Completed`
-- [ ] Add homepage (`/`) — tagline, search input linking to `/tools?q=`, category cards
+- [x] Add homepage (`/`) — tagline, search input linking to `/tools?q=`, category cards
 - [ ] **Checkpoint** — `/tools` lists all 5 data tools grouped under Data with no missing cards; `/tools/json-to-yaml` renders with inline editor and performs an end-to-end conversion; `OutputPanel` appears on completion with a working copy trigger; `/tools/nonexistent` shows the 404 fallback page — no unhandled exception
 
 ---

@@ -1,0 +1,319 @@
+@page "/tools/{Slug}"
+@using Fileway.Shared.Processors
+@using System.Text
+@using System.Diagnostics
+@inject IToolRegistry ToolRegistry
+@inject DetectionService DetectionService
+@inject ProcessorRouter ProcessorRouter
+@inject ApiJobClient ApiJobClient
+@inject ToolStateService ToolStateService
+@implements IDisposable
+
+@if (_tool is null)
+{
+    <div class="tool-not-found">
+        <h1>Tool not found</h1>
+        <p>There is no tool with slug <code>@Slug</code>.</p>
+        <a href="/tools">Browse all tools →</a>
+    </div>
+}
+else
+{
+    <div class="tool-page">
+        <header class="tool-header">
+            <div class="tool-header-meta">
+                <a href="/tools" class="back-link" aria-label="Back to all tools">← Tools</a>
+                <span class="tool-category">@_tool.Category</span>
+            </div>
+            <h1 class="tool-title">@_tool.DisplayName</h1>
+            <p class="tool-description">@_tool.Description</p>
+        </header>
+
+        <div class="tool-workspace">
+            @if (_tool.OutputFormats.Length > 1)
+            {
+                <div class="tool-format-row">
+                    <OutputFormatSelector
+                        OutputFormats="_tool.OutputFormats.ToArray()"
+                        SelectedFormat="_selectedOutputFormat"
+                        OnFormatSelected="HandleFormatSelected" />
+                </div>
+            }
+
+            @if (!_tool.RequiresFileInput)
+            {
+                <InlineEditorPreview
+                    InputText="_inputText"
+                    OutputText="_outputText"
+                    DetectedFormat="_detectedInputFormat"
+                    OutputFormat="_selectedOutputFormat"
+                    IsConverting="_isConverting"
+                    Placeholder="@BuildPlaceholder()"
+                    OnInputChanged="HandleInputChanged"
+                    OnConvert="HandleConvert" />
+            }
+            else
+            {
+                <DropZone OnFileSelected="HandleFileSelected" />
+            }
+
+            <ToolOptionsPanel UiHints="_tool.UiHints" />
+
+            @if (ToolStateService.State is ToolState.Submitting or ToolState.Processing)
+            {
+                <ProgressPanel
+                    IsVisible="true"
+                    Stage="@ToolStateService.CurrentStage"
+                    StageIndex="@ToolStateService.StageIndex"
+                    StageTotalCount="@ToolStateService.StageTotalCount"
+                    OverallPercent="@ToolStateService.OverallPercent" />
+            }
+
+            @if (ToolStateService.State == ToolState.Failed)
+            {
+                <ErrorPanel
+                    ErrorCode="@ToolStateService.ErrorCode"
+                    FallbackMessage="@ToolStateService.ErrorMessage"
+                    IsRetryable="@ToolStateService.IsRetryable"
+                    RetryAfterSeconds="@ToolStateService.RetryAfterSeconds"
+                    RelatedSlugs="_tool.RelatedSlugs.ToArray()"
+                    OnRetry="HandleRetry" />
+            }
+
+            @if (ToolStateService.State == ToolState.Completed && _syncResult is not null)
+            {
+                <OutputPanel
+                    IsVisible="true"
+                    Result="_syncResult"
+                    OutputFormat="_selectedOutputFormat" />
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string Slug { get; set; } = string.Empty;
+
+    private ToolDefinition? _tool;
+    private string _inputText = string.Empty;
+    private string? _outputText;
+    private FileFormat? _detectedInputFormat;
+    private FileFormat? _selectedOutputFormat;
+    private bool _isConverting;
+    private SyncJobResult? _syncResult;
+    private CancellationTokenSource? _cts;
+
+    protected override void OnInitialized()
+    {
+        ToolStateService.StateChanged += OnStateChanged;
+    }
+
+    protected override void OnParametersSet()
+    {
+        var tool = ToolRegistry.GetBySlug(Slug);
+
+        if (_tool?.Slug != tool?.Slug)
+        {
+            _tool = tool;
+            _inputText = string.Empty;
+            _outputText = null;
+            _detectedInputFormat = null;
+            _syncResult = null;
+            _isConverting = false;
+            _cts?.Cancel();
+            ToolStateService.Reset();
+            _selectedOutputFormat = _tool?.DefaultOutputFormat ?? _tool?.OutputFormats.FirstOrDefault();
+        }
+    }
+
+    private void OnStateChanged() => InvokeAsync(StateHasChanged);
+
+    private void HandleFormatSelected(FileFormat format) => _selectedOutputFormat = format;
+
+    private void HandleInputChanged(string text)
+    {
+        _inputText = text;
+        if (ToolStateService.State is ToolState.Completed or ToolState.Failed)
+        {
+            _outputText = null;
+            _syncResult = null;
+            ToolStateService.Reset();
+        }
+    }
+
+    private async Task HandleConvert(string inputText)
+    {
+        if (_tool is null || _isConverting) return;
+
+        _isConverting = true;
+        _outputText = null;
+        _syncResult = null;
+        ToolStateService.BeginSubmitting();
+        StateHasChanged();
+
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        var ct = _cts.Token;
+
+        try
+        {
+            var inputBytes = Encoding.UTF8.GetBytes(inputText);
+
+            var (detectedFormat, _) = await DetectionService.DetectAsync(inputBytes, "input.txt", ct);
+            _detectedInputFormat = detectedFormat;
+
+            if (detectedFormat is null)
+            {
+                ToolStateService.Fail(null,
+                    "Could not detect the format of your input. Please paste valid JSON, YAML, CSV, or TOML.",
+                    false);
+                return;
+            }
+
+            var outputFormat = _selectedOutputFormat ?? _tool.DefaultOutputFormat ?? detectedFormat;
+
+            var inputFile = new Fileway.Shared.Processors.InputFile
+            {
+                Content = inputBytes,
+                DetectedFormat = detectedFormat,
+                SizeBytes = inputBytes.Length,
+                Index = 0
+            };
+
+            var toolOptions = System.Text.Json.JsonDocument.Parse("{}").RootElement;
+            var progress = new Progress<ProcessorProgressEvent>(e =>
+            {
+                ToolStateService.UpdateProgress(e.Stage, e.StageIndex, e.StageTotalCount, e.OverallPercent);
+                InvokeAsync(StateHasChanged);
+            });
+
+            var sw = Stopwatch.StartNew();
+
+            ProcessorResult? wasmResult = null;
+            try
+            {
+                wasmResult = await ProcessorRouter.TryRunWasmAsync(
+                    _tool.Slug, [inputFile], outputFormat, toolOptions, progress, ct);
+            }
+            catch (ProcessorDomainException ex)
+            {
+                ToolStateService.Fail(ex.ErrorCode, ex.Message, false);
+                return;
+            }
+            catch (ProcessorValidationException ex)
+            {
+                ToolStateService.Fail(ex.ErrorCode, ex.Message, false);
+                return;
+            }
+
+            sw.Stop();
+
+            if (wasmResult is not null)
+            {
+                await ApplyWasmResultAsync(wasmResult, sw.ElapsedMilliseconds);
+                return;
+            }
+
+            // API fallback (WasmPreferred tools that exceeded size threshold)
+            var apiResult = await ApiJobClient.SubmitAsync(
+                _tool.Slug, inputBytes, "input.txt", detectedFormat,
+                outputFormat.Id, toolOptions, ct);
+
+            ApplyApiResult(apiResult, outputFormat);
+        }
+        catch (OperationCanceledException)
+        {
+            ToolStateService.Reset();
+        }
+        catch (Exception ex)
+        {
+            ToolStateService.Fail(null, ex.Message, false);
+        }
+        finally
+        {
+            _isConverting = false;
+            StateHasChanged();
+        }
+    }
+
+    private Task ApplyWasmResultAsync(ProcessorResult result, long durationMs)
+    {
+        var base64 = Convert.ToBase64String(result.OutputContent.ToArray());
+        _syncResult = new SyncJobResult
+        {
+            ToolSlug = _tool!.Slug,
+            OutputFormat = result.OutputFormat.Id,
+            OutputMimeType = result.OutputFormat.MimeTypes.FirstOrDefault() ?? "application/octet-stream",
+            OutputSizeBytes = result.OutputContent.Length,
+            DurationMs = durationMs,
+            DeliveryKind = DeliveryKind.Inline,
+            InlineContent = base64
+        };
+        _selectedOutputFormat = result.OutputFormat;
+
+        if (result.OutputFormat.IsTextBased)
+            _outputText = Encoding.UTF8.GetString(result.OutputContent.ToArray());
+
+        ToolStateService.CompleteSync(_syncResult);
+        return Task.CompletedTask;
+    }
+
+    private void ApplyApiResult(ApiJobResult result, FileFormat outputFormat)
+    {
+        switch (result)
+        {
+            case SyncResult sync:
+                _syncResult = sync.Result;
+                if (outputFormat.IsTextBased && sync.Result.InlineContent is not null)
+                {
+                    try
+                    {
+                        var bytes = Convert.FromBase64String(sync.Result.InlineContent);
+                        _outputText = Encoding.UTF8.GetString(bytes);
+                    }
+                    catch { }
+                }
+                ToolStateService.CompleteSync(sync.Result);
+                break;
+
+            case FailureResult fail:
+                ToolStateService.Fail(
+                    fail.Problem.ErrorCode,
+                    fail.Problem.UserMessage,
+                    fail.Problem.Retryable,
+                    ApiJobClient.RetryAfterSeconds);
+                break;
+
+            default:
+                ToolStateService.Fail(null, "Unexpected response from server.", false);
+                break;
+        }
+    }
+
+    private void HandleFileSelected(DropZoneFile file)
+    {
+        _detectedInputFormat = file.DetectedFormat;
+        ToolStateService.Reset();
+    }
+
+    private Task HandleRetry()
+    {
+        _outputText = null;
+        _syncResult = null;
+        ToolStateService.Reset();
+        return Task.CompletedTask;
+    }
+
+    private string BuildPlaceholder()
+    {
+        if (_tool is null) return "Paste or type your content here…";
+        var formats = string.Join(", ", _tool.AcceptedFormats.Select(f => f.DisplayName));
+        return $"Paste or type your {formats} here…";
+    }
+
+    public void Dispose()
+    {
+        ToolStateService.StateChanged -= OnStateChanged;
+        _cts?.Dispose();
+    }
+}
