@@ -92,7 +92,7 @@ Linear meets Vercel. Clean, precise, confident. Not playful, not corporate. Dark
 
 ---
 
-## Syntax Highlighting
+## Syntax Highlighting — Output Pane
 
 `SyntaxHighlightPreview.razor` uses **Prism.js** (self-hosted, no CDN) for all text-based formats that have a Prism grammar.
 
@@ -113,11 +113,43 @@ Linear meets Vercel. Clean, precise, confident. Not playful, not corporate. Dark
 
 ---
 
+## Input Editor — CodeMirror 6
+
+`CodeMirrorEditor.razor` wraps **CodeMirror 6** (self-hosted IIFE bundle, no CDN) for the input pane on data-tool pages.
+
+**Bundle:** `codemirror-fileway.js` (~427 KB minified) built with esbuild from source packages:
+- `codemirror` (core + basicSetup)
+- `@codemirror/lang-json` — JSON grammar
+- `@codemirror/lang-yaml` — YAML grammar
+- `@codemirror/legacy-modes` (TOML mode via `StreamLanguage.define`)
+
+Exposes `window.FilewayEditor` with four methods: `create`, `setContent`, `setLanguage`, `destroy`.
+
+**Language switching:** Uses a CodeMirror `Compartment` to swap grammars without recreating the editor. Language is updated via `setLanguage` when `DetectedFormat` changes.
+
+**Theme:** `EditorView.theme()` uses CSS custom properties (`var(--color-bg-primary)` etc.). Syntax token colours are separate `--cm-*` tokens defined in `app.css` under `[data-theme="dark"]` / `[data-theme="light"]` selectors — same flip behaviour as all other tokens.
+
+**Blazor integration:** `CodeMirrorEditor.razor` creates the editor on `OnAfterRenderAsync(firstRender: true)` and tracks `_lastContent` to suppress echo — when the editor reports a change, the parent sets `Value` back, `OnParametersSetAsync` sees it matches `_lastContent` and skips `setContent`. This preserves cursor position. Component implements `IAsyncDisposable`; `DisposeAsync` calls `FilewayEditor.destroy`.
+
+**Formats supported in input pane:**
+
+| Format | Language | Highlighted |
+|---|---|---|
+| JSON | `json` | ✓ |
+| YAML | `yaml` | ✓ |
+| TOML | `toml` | ✓ |
+| CSV | `""` (empty) | plain monospace |
+
+**Rule:** To rebuild the bundle (e.g. to add a new language), run `esbuild` from `/tmp/cm-build/` after updating `entry.js`. Copy output to `wwwroot/js/codemirror-fileway.js`. Build sources are in `entry.js` alongside the tmp build.
+
+---
+
 ## Component Rules
 
 **Blazor CSS isolation:** Each component has its own `.razor.css` scoped file. No global style pollution.  
 **No hardcoded colours:** Every colour value is a CSS custom property. No hex values in component styles.  
-**No component library:** No MudBlazor, Radzen, or any third-party component CSS/JS.  
+**No Blazor component libraries:** No MudBlazor, Radzen, or similar. UI is custom CSS with design tokens.  
+**JS utility libraries permitted when self-hosted:** Prism.js and CodeMirror 6 are allowed — they are utility libraries, not component libraries, and all assets are in `wwwroot/`.  
 **No CDN at runtime:** All JS and font assets are self-hosted in `wwwroot/`.
 
 ---

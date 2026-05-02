@@ -1,0 +1,18 @@
+.cm-host {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ::deep pierces Blazor CSS scoping to reach JS-injected CodeMirror elements */
+.cm-host ::deep .cm-editor {
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+}
+
+.cm-host ::deep .cm-scroller {
+    overflow: auto;
+}

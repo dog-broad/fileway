@@ -9,13 +9,11 @@
                 <span class="format-chip">@DetectedFormat.DisplayName</span>
             }
         </div>
-        <textarea class="pane-textarea"
-                  placeholder="@Placeholder"
-                  value="@InputText"
-                  @oninput="HandleInput"
-                  aria-label="Input text"
-                  spellcheck="false">
-        </textarea>
+        <CodeMirrorEditor
+            Value="@InputText"
+            ValueChanged="HandleInput"
+            Language="@(DetectedFormat?.Id ?? "")"
+            Placeholder="@Placeholder" />
     </div>
 
     <div class="inline-editor-divider" aria-hidden="true">
@@ -82,9 +80,8 @@
     [Parameter] public bool IsConverting { get; set; }
     [Parameter] public string Placeholder { get; set; } = "Paste or type your content here…";
 
-    private async Task HandleInput(ChangeEventArgs e)
+    private async Task HandleInput(string text)
     {
-        var text = e.Value?.ToString() ?? string.Empty;
         await OnInputChanged.InvokeAsync(text);
     }
 
