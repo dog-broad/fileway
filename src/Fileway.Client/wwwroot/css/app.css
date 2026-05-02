@@ -59,6 +59,18 @@
     --cm-comment:      #475569;
     --cm-operator:     #94a3b8;
     --cm-type:         #a5b4fc;
+
+    /* Format identity tints */
+    --format-json-bg:  rgba(251, 191, 36,  0.12);
+    --format-json-fg:  #fbbf24;
+    --format-yaml-bg:  rgba(167, 139, 250, 0.12);
+    --format-yaml-fg:  #a78bfa;
+    --format-csv-bg:   rgba(52,  211, 153, 0.12);
+    --format-csv-fg:   #34d399;
+    --format-toml-bg:  rgba(56,  189, 248, 0.12);
+    --format-toml-fg:  #38bdf8;
+    --format-xlsx-bg:  rgba(45,  212, 191, 0.12);
+    --format-xlsx-fg:  #2dd4bf;
 }
 
 [data-theme="light"] {
@@ -86,6 +98,18 @@
     --cm-comment:      #94a3b8;
     --cm-operator:     #475569;
     --cm-type:         #4f46e5;
+
+    /* Format identity tints */
+    --format-json-bg:  rgba(180, 83,  9,   0.09);
+    --format-json-fg:  #b45309;
+    --format-yaml-bg:  rgba(109, 40,  217, 0.09);
+    --format-yaml-fg:  #6d28d9;
+    --format-csv-bg:   rgba(4,   120, 87,  0.09);
+    --format-csv-fg:   #047857;
+    --format-toml-bg:  rgba(3,   105, 161, 0.09);
+    --format-toml-fg:  #0369a1;
+    --format-xlsx-bg:  rgba(15,  118, 110, 0.09);
+    --format-xlsx-fg:  #0f766e;
 }
 
 /* ── Spacing ───────────────────────────────────────────────────── */

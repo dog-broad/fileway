@@ -1,6 +1,22 @@
 @using Fileway.Shared.Tools
 
 <a href="/tools/@Tool.Slug" class="tool-card">
+    @if (Tool.Kind == ToolKind.Conversion)
+    {
+        <ConversionPair
+            InputFormat="@Tool.AcceptedFormats[0]"
+            OutputFormat="@(Tool.DefaultOutputFormat ?? Tool.OutputFormats[0])"
+            Size="BadgeSize.Md" />
+    }
+    else
+    {
+        <div class="tool-format-cluster">
+            @foreach (var fmt in Tool.AcceptedFormats.Take(4))
+            {
+                <FormatBadge Format="fmt" Size="BadgeSize.Sm" />
+            }
+        </div>
+    }
     <div class="tool-card-header">
         <span class="tool-card-name">@Tool.DisplayName</span>
         <div class="tool-card-badges">
@@ -14,7 +30,7 @@
             }
         </div>
     </div>
-    <p class="tool-card-description">@Tool.ShortDescription</p>
+    <p class="tool-card-description">@Tool.Description</p>
 </a>
 
 @code {

@@ -7,7 +7,7 @@
             <span class="pane-label">Input</span>
             @if (DetectedFormat is not null)
             {
-                <span class="format-chip">@DetectedFormat.DisplayName</span>
+                <FormatBadge Format="DetectedFormat" Size="BadgeSize.Sm" />
             }
             @if (Examples is { Length: > 0 })
             {
@@ -69,7 +69,7 @@
             <span class="pane-label">Output</span>
             @if (OutputFormat is not null)
             {
-                <span class="format-chip">@OutputFormat.DisplayName</span>
+                <FormatBadge Format="OutputFormat" Size="BadgeSize.Sm" />
             }
         </div>
         <div class="pane-output">

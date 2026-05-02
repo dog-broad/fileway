@@ -92,6 +92,68 @@ Linear meets Vercel. Clean, precise, confident. Not playful, not corporate. Dark
 
 ---
 
+## Format Identity System
+
+Every file format has a **visual identity** — a distinct SVG icon and a tint color pair — used consistently everywhere a format appears in the UI. The format pair `[A] → [B]` is the primary visual identity of each conversion tool.
+
+### Format Tint Tokens
+
+Defined in `app.css` under both `[data-theme]` blocks. One pair per format:
+
+| Token | Purpose |
+|---|---|
+| `--format-{id}-bg` | Soft background (low opacity tint) |
+| `--format-{id}-fg` | Foreground — icon, label, and border color |
+
+Current formats: `json` (amber), `yaml` (violet), `csv` (emerald), `toml` (sky), `xlsx` (teal).
+
+Fallback when a format has no tokens: `color-mix(in srgb, var(--color-accent) 12%, transparent)` for bg, `var(--color-accent)` for fg.
+
+### Format Icons
+
+`FormatIcon.razor` — renders a 24×24-viewBox SVG whose paths encode the format's **structure**, not a logo:
+
+| Format | Icon concept |
+|---|---|
+| `json` | Curly braces `{ }` |
+| `yaml` | Three staggered lines — YAML's indented hierarchy |
+| `csv` | 3×3 table grid |
+| `toml` | `[ ]` bracket wrapping key=value lines |
+| `xlsx` | Spreadsheet grid with filled header row |
+| fallback | Generic file icon |
+
+Parameters: `FormatId` (string, required), `Width` (int, default 16).
+
+### FormatBadge Component
+
+`FormatBadge.razor` — a pill chip: `[icon] FORMAT-NAME`. Sets `--badge-bg` and `--badge-fg` as inline CSS variables resolved from the format tint tokens.
+
+Parameter `Size`: `BadgeSize.Sm` (20px, 12px icon) · `Md` (24px, 14px icon) · `Lg` (32px, 18px icon). `BadgeSize` enum lives in `BadgeSize.cs`.
+
+### ConversionPair Component
+
+`ConversionPair.razor` — renders `[FormatBadge A] → [FormatBadge B]`. Same `Size` parameter.
+
+### Where Format Identity Appears
+
+| Surface | Component | Size |
+|---|---|---|
+| Tool cards (`/tools`) | `ConversionPair` or format cluster | `Md` |
+| Tool page header | `ConversionPair` or format cluster | `Lg` |
+| Inline editor panes | `FormatBadge` (detected / selected) | `Sm` |
+
+**Conversion tools** (`ToolKind.Conversion`): show `ConversionPair`. Input format is computed as the first accepted format whose ID doesn't match the current selected output format — this makes alias URLs (e.g. `yaml-to-json`) automatically show `[YAML] → [JSON]`.
+
+**Manipulation tools** (`ToolKind.Manipulation`): show a `tool-format-cluster` flex row of `FormatBadge` components for each accepted format.
+
+### Adding a New Format
+
+1. Add `--format-{id}-bg` and `--format-{id}-fg` tokens to both themes in `app.css`
+2. Add an `else if (FormatId == "{id}")` branch to `FormatIcon.razor` with the icon paths
+3. The badge and pair components pick up the new format automatically via the inline variable pattern
+
+---
+
 ## Syntax Highlighting — Output Pane
 
 `SyntaxHighlightPreview.razor` uses **Prism.js** (self-hosted, no CDN) for all text-based formats that have a Prism grammar.

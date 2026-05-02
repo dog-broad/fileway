@@ -25,6 +25,21 @@ else
                 <a href="/tools" class="back-link" aria-label="Back to all tools">← Tools</a>
                 <span class="tool-category">@_tool.Category</span>
             </div>
+            @if (_tool.Kind == ToolKind.Conversion && ActiveInputFormat is not null && _selectedOutputFormat is not null)
+            {
+                <div class="tool-header-pair">
+                    <ConversionPair InputFormat="ActiveInputFormat" OutputFormat="_selectedOutputFormat" Size="BadgeSize.Lg" />
+                </div>
+            }
+            else if (_tool.Kind == ToolKind.Manipulation)
+            {
+                <div class="tool-header-cluster">
+                    @foreach (var fmt in _tool.AcceptedFormats)
+                    {
+                        <FormatBadge Format="fmt" Size="BadgeSize.Md" />
+                    }
+                </div>
+            }
             <h1 class="tool-title">@ActiveDisplayName</h1>
             <p class="tool-description">@ActiveDescription</p>
         </header>
@@ -108,6 +123,11 @@ else
     private string ActiveDisplayName => _alias?.DisplayName ?? _tool?.DisplayName ?? string.Empty;
     private string ActiveDescription => _alias?.Description ?? _tool?.Description ?? string.Empty;
     private ToolExample[] ActiveExamples => _alias?.Examples is { Length: > 0 } e ? e : _tool?.Examples ?? [];
+
+    private FileFormat? ActiveInputFormat => _tool?.Kind == ToolKind.Conversion
+        ? (_tool.AcceptedFormats.FirstOrDefault(f => f.Id != _selectedOutputFormat?.Id)
+           ?? _tool.AcceptedFormats.FirstOrDefault())
+        : null;
 
     protected override void OnInitialized()
     {

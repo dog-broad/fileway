@@ -1,0 +1,36 @@
+@using Fileway.Shared.Formats
+
+<div class="conversion-pair conversion-pair--@_sizeName">
+    <FormatBadge Format="InputFormat" Size="Size" />
+    <svg class="conversion-pair-arrow"
+         xmlns="http://www.w3.org/2000/svg"
+         width="@_arrowSize" height="@_arrowSize"
+         viewBox="0 0 24 24"
+         fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+         aria-hidden="true">
+        <line x1="5" y1="12" x2="19" y2="12"/>
+        <polyline points="12 5 19 12 12 19"/>
+    </svg>
+    <FormatBadge Format="OutputFormat" Size="Size" />
+</div>
+
+@code {
+    [Parameter, EditorRequired] public FileFormat InputFormat { get; set; } = null!;
+    [Parameter, EditorRequired] public FileFormat OutputFormat { get; set; } = null!;
+    [Parameter] public BadgeSize Size { get; set; } = BadgeSize.Md;
+
+    private string _sizeName => Size switch
+    {
+        BadgeSize.Sm => "sm",
+        BadgeSize.Lg => "lg",
+        _ => "md"
+    };
+
+    private int _arrowSize => Size switch
+    {
+        BadgeSize.Sm => 12,
+        BadgeSize.Lg => 20,
+        _ => 14
+    };
+}
