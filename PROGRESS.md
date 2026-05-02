@@ -141,14 +141,14 @@
 
 ### Data Format Processors (WASM)
 
-- [ ] Implement `JsonYamlProcessor` in `Fileway.Client/Processors/DataFormats/` using `YamlDotNet` — bidirectional; direction from `context.InputFiles[0].DetectedFormat`
+- [x] Implement `JsonYamlProcessor` in `Fileway.Client/Processors/DataFormats/` using `YamlDotNet` — bidirectional; direction from `context.InputFiles[0].DetectedFormat`
   > Call `await Task.Yield()` before heavy parse loops to yield control back to the Blazor render thread
-- [ ] Implement `JsonCsvProcessor` in `Fileway.Client/Processors/DataFormats/` using `CsvHelper` — bidirectional
-- [ ] Implement `JsonTomlProcessor` in `Fileway.Client/Processors/DataFormats/` using `Tomlyn` — bidirectional
-- [ ] Implement `ValidateProcessor` in `Fileway.Client/Processors/DataFormats/` — validates JSON/YAML/CSV/TOML structure; throws `ProcessorDomainException` with the appropriate `ErrorCode` on malformed input
-- [ ] Implement `CsvToXlsxProcessor` (WASM path) in `Fileway.Client/Processors/DataFormats/` using `ClosedXML`
-  > Verify `ClosedXML` compiles to WASM before wiring up — known risk; if it does not, mark `CanHandleSize` always false to force the API path
-- [ ] Register all WASM data processors in `WasmProcessorExtensions.cs`
+- [x] Implement `JsonCsvProcessor` in `Fileway.Client/Processors/DataFormats/` using `CsvHelper` — bidirectional
+- [x] Implement `JsonTomlProcessor` in `Fileway.Client/Processors/DataFormats/` using `Tomlyn` — bidirectional
+- [x] Implement `ValidateProcessor` in `Fileway.Client/Processors/DataFormats/` — validates JSON/YAML/CSV/TOML structure; throws `ProcessorDomainException` with the appropriate `ErrorCode` on malformed input
+- [x] Implement `CsvToXlsxProcessor` (WASM path) in `Fileway.Client/Processors/DataFormats/` using `ClosedXML`
+  > ClosedXML 0.104.1 compiles to WASM without issues — `CanHandleSize` uses the 5 MB threshold from `DataTools.CsvToXlsx`
+- [x] Register all WASM data processors in `WasmProcessorExtensions.cs`
 - [ ] **Checkpoint** — Navigate to `/tools/json-to-yaml`; enter `{"key": "value"}`; output pane shows `key: value`; navigate to `/tools/validate`; enter `{invalid`; `ErrorPanel` shows the malformed-JSON copy from `ErrorMessages.cs`
 
 ---
