@@ -34,6 +34,7 @@ public static class ErrorCodes
     public const string MalformedYaml = "MalformedYaml";
     public const string InvalidCsv = "InvalidCsv";
     public const string MalformedToml = "MalformedToml";
+    public const string JsonNotCsvCompatible = "JsonNotCsvCompatible";
 
     // Processing (5xx)
     public const string JobTimeout = "JobTimeout";

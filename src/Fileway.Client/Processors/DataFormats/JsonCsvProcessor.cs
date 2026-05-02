@@ -48,15 +48,15 @@ public sealed class JsonCsvProcessor : IWasmProcessor
 
         var root = doc.RootElement;
         if (root.ValueKind != JsonValueKind.Array)
-            throw new ProcessorDomainException(ErrorCodes.ConversionFailed,
-                "JSON input must be an array of objects to convert to CSV.");
+            throw new ProcessorDomainException(ErrorCodes.JsonNotCsvCompatible,
+                "JSON root must be an array.");
 
         var rows = root.EnumerateArray().ToList();
         if (rows.Count == 0) return string.Empty;
 
         if (rows[0].ValueKind != JsonValueKind.Object)
-            throw new ProcessorDomainException(ErrorCodes.ConversionFailed,
-                "JSON array elements must be objects to convert to CSV.");
+            throw new ProcessorDomainException(ErrorCodes.JsonNotCsvCompatible,
+                "JSON array elements must be objects.");
 
         var headers = rows[0].EnumerateObject().Select(p => p.Name).ToList();
 

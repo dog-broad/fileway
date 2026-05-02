@@ -47,6 +47,7 @@ No layer invents its own error copy. No layer invents its own error code strings
 | MalformedJson | This doesn't appear to be valid JSON. | Check for missing brackets, commas, or quotes. | false |
 | MalformedYaml | This doesn't appear to be valid YAML. | Check for incorrect indentation or special characters. | false |
 | InvalidCsv | This CSV file has inconsistent columns. | Ensure every row has the same number of columns. | false |
+| JsonNotCsvCompatible | JSON-to-CSV requires a flat array of objects. | Wrap your records in a JSON array: [{"field": "value"}, ...]. Nested objects and arrays are not supported. | false |
 | JobTimeout | This conversion took too long and was stopped. | Try with a smaller file, or split it into parts. | true |
 | RateLimitExceeded | Too many conversions in a short time. | Wait a moment and try again. | true |
 | QueueFull | The server is very busy right now. | Wait a moment and try again. | true |

@@ -22,6 +22,7 @@ public static class ErrorMessages
         [ErrorCodes.MalformedYaml]           = new("This doesn't appear to be valid YAML.", "Check for incorrect indentation or special characters.", false),
         [ErrorCodes.InvalidCsv]             = new("This CSV file has inconsistent columns.", "Ensure every row has the same number of columns.", false),
         [ErrorCodes.MalformedToml]           = new("This doesn't appear to be valid TOML.", "Check for syntax errors in key-value pairs or table headers.", false),
+        [ErrorCodes.JsonNotCsvCompatible]    = new("JSON-to-CSV requires a flat array of objects.", "Wrap your records in a JSON array: [{\"field\": \"value\"}, ...]. Nested objects and arrays are not supported.", false),
         [ErrorCodes.JobTimeout]              = new("This conversion took too long and was stopped.", "Try with a smaller file, or split it into parts.", true),
         [ErrorCodes.RateLimitExceeded]       = new("Too many conversions in a short time.", "Wait a moment and try again.", true),
         [ErrorCodes.QueueFull]               = new("The server is very busy right now.", "Wait a moment and try again.", true),
