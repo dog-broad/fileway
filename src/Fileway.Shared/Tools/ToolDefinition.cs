@@ -51,6 +51,9 @@ public sealed record ToolDefinition
     public required string[] RelatedSlugs { get; init; }
     public required int SuggestionWeight { get; init; }
 
+    // Alias slugs (reverse-direction URLs for bidirectional tools)
+    public ToolSlugAlias[] SlugAliases { get; init; } = [];
+
     // Examples
     public ToolExample[] Examples { get; init; } = [];
 }

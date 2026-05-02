@@ -25,8 +25,8 @@ else
                 <a href="/tools" class="back-link" aria-label="Back to all tools">← Tools</a>
                 <span class="tool-category">@_tool.Category</span>
             </div>
-            <h1 class="tool-title">@_tool.DisplayName</h1>
-            <p class="tool-description">@_tool.Description</p>
+            <h1 class="tool-title">@ActiveDisplayName</h1>
+            <p class="tool-description">@ActiveDescription</p>
         </header>
 
         <div class="tool-workspace">
@@ -49,7 +49,7 @@ else
                     OutputFormat="_selectedOutputFormat"
                     IsConverting="_isConverting"
                     Placeholder="@BuildPlaceholder()"
-                    Examples="@_tool.Examples"
+                    Examples="@ActiveExamples"
                     OnInputChanged="HandleInputChanged"
                     OnConvert="HandleConvert" />
             }
@@ -96,6 +96,7 @@ else
     [Parameter] public string Slug { get; set; } = string.Empty;
 
     private ToolDefinition? _tool;
+    private ToolSlugAlias? _alias;
     private string _inputText = string.Empty;
     private string? _outputText;
     private FileFormat? _detectedInputFormat;
@@ -103,6 +104,10 @@ else
     private bool _isConverting;
     private SyncJobResult? _syncResult;
     private CancellationTokenSource? _cts;
+
+    private string ActiveDisplayName => _alias?.DisplayName ?? _tool?.DisplayName ?? string.Empty;
+    private string ActiveDescription => _alias?.Description ?? _tool?.Description ?? string.Empty;
+    private ToolExample[] ActiveExamples => _alias?.Examples is { Length: > 0 } e ? e : _tool?.Examples ?? [];
 
     protected override void OnInitialized()
     {
@@ -112,10 +117,12 @@ else
     protected override void OnParametersSet()
     {
         var tool = ToolRegistry.GetBySlug(Slug);
+        var alias = ToolRegistry.GetAlias(Slug);
 
-        if (_tool?.Slug != tool?.Slug)
+        if (_tool?.Slug != tool?.Slug || _alias?.Slug != alias?.Slug)
         {
             _tool = tool;
+            _alias = alias;
             _inputText = string.Empty;
             _outputText = null;
             _detectedInputFormat = null;
@@ -123,7 +130,9 @@ else
             _isConverting = false;
             _cts?.Cancel();
             ToolStateService.Reset();
-            _selectedOutputFormat = _tool?.DefaultOutputFormat ?? _tool?.OutputFormats.FirstOrDefault();
+            _selectedOutputFormat = alias?.PresetOutputFormat
+                ?? _tool?.DefaultOutputFormat
+                ?? _tool?.OutputFormats.FirstOrDefault();
         }
     }
 

@@ -21,6 +21,8 @@
 - [x] Add `ToolLimits` record to `Fileway.Shared/Tools/ToolLimits.cs`
 - [x] Create `Fileway.Shared/Tools/Definitions/DataTools.cs` with all 5 data tool `ToolDefinition` records
   > `ProcessorType` is null for WasmOnly tools; set it to `typeof(CsvToXlsxProcessor)` only for the csv-to-xlsx API fallback path
+- [x] Add `ToolSlugAlias` record and `SlugAliases` field on `ToolDefinition`; update `ToolRegistry` to resolve alias slugs in `GetBySlug`, `ValidateSlug`, `GetSitemapEntries`; add `GetAlias` to `IToolRegistry`; wire into `ToolPage` to apply preset output format, alias display name/description/examples (ref: `01-tool-registry.md`)
+  > Bidirectional M1 tools get reverse aliases: `yaml-to-json`, `csv-to-json`, `toml-to-json`
 - [x] Create `Fileway.Shared/Registry/ToolRegistry.cs` with all query methods (ref: `01-tool-registry.md`)
   > ToolRegistry is a singleton built once at startup from a fixed list — it does not scan assemblies
 - [x] Add all error code string constants to `Fileway.Shared/Errors/ErrorCodes.cs` — every error code from the taxonomy (ref: `03-api-surface.md`)

@@ -7,6 +7,8 @@ public sealed class ToolRegistry : IToolRegistry
 {
     private readonly IReadOnlyList<ToolDefinition> _all;
     private readonly Dictionary<string, ToolDefinition> _bySlug;
+    private readonly Dictionary<string, ToolDefinition> _byAlias;
+    private readonly Dictionary<string, ToolSlugAlias> _aliases;
 
     public ToolRegistry(IEnumerable<ToolDefinition> tools)
     {
@@ -17,10 +19,24 @@ public sealed class ToolRegistry : IToolRegistry
 
         _all = ordered;
         _bySlug = ordered.ToDictionary(t => t.Slug);
+
+        _byAlias = [];
+        _aliases = [];
+        foreach (var tool in ordered)
+        {
+            foreach (var alias in tool.SlugAliases)
+            {
+                _byAlias[alias.Slug] = tool;
+                _aliases[alias.Slug] = alias;
+            }
+        }
     }
 
     public ToolDefinition? GetBySlug(string slug) =>
-        _bySlug.GetValueOrDefault(slug);
+        _bySlug.GetValueOrDefault(slug) ?? _byAlias.GetValueOrDefault(slug);
+
+    public ToolSlugAlias? GetAlias(string slug) =>
+        _aliases.GetValueOrDefault(slug);
 
     public IReadOnlyList<ToolDefinition> GetAll() => _all;
 
@@ -36,8 +52,8 @@ public sealed class ToolRegistry : IToolRegistry
 
     public IReadOnlyList<ToolDefinition> GetRelated(string slug, int limit)
     {
-        if (!_bySlug.TryGetValue(slug, out var tool))
-            return [];
+        var tool = GetBySlug(slug);
+        if (tool is null) return [];
 
         return tool.RelatedSlugs
             .Select(s => _bySlug.GetValueOrDefault(s))
@@ -59,16 +75,32 @@ public sealed class ToolRegistry : IToolRegistry
     public IReadOnlyList<ToolDefinition> GetAccepting(FileFormat format) =>
         _all.Where(t => t.AcceptedFormats.Any(f => f.Id == format.Id)).ToList();
 
-    public IReadOnlyList<SitemapEntry> GetSitemapEntries() =>
-        _all
-            .Select(t => new SitemapEntry
+    public IReadOnlyList<SitemapEntry> GetSitemapEntries()
+    {
+        var entries = new List<SitemapEntry>();
+        foreach (var tool in _all)
+        {
+            entries.Add(new SitemapEntry
             {
-                Slug = t.Slug,
-                CanonicalPath = t.CanonicalPath,
-                SeoTitle = t.SeoTitle,
-                SeoDescription = t.SeoDescription
-            })
-            .ToList();
+                Slug = tool.Slug,
+                CanonicalPath = tool.CanonicalPath,
+                SeoTitle = tool.SeoTitle,
+                SeoDescription = tool.SeoDescription
+            });
+            foreach (var alias in tool.SlugAliases)
+            {
+                entries.Add(new SitemapEntry
+                {
+                    Slug = alias.Slug,
+                    CanonicalPath = $"/tools/{alias.Slug}",
+                    SeoTitle = alias.SeoTitle,
+                    SeoDescription = alias.SeoDescription
+                });
+            }
+        }
+        return entries;
+    }
 
-    public bool ValidateSlug(string slug) => _bySlug.ContainsKey(slug);
+    public bool ValidateSlug(string slug) =>
+        _bySlug.ContainsKey(slug) || _byAlias.ContainsKey(slug);
 }

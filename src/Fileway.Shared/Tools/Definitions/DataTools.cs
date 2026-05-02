@@ -42,6 +42,104 @@ public static class DataTools
         SeoKeywords = ["json to yaml", "yaml to json", "json yaml converter", "yaml converter"],
         RelatedSlugs = ["json-to-csv", "json-to-toml", "validate"],
         SuggestionWeight = 90,
+        SlugAliases =
+        [
+            new()
+            {
+                Slug = "yaml-to-json",
+                PresetOutputFormat = FileFormats.Json,
+                DisplayName = "YAML → JSON",
+                Description = "Convert YAML to JSON instantly in your browser. Paste YAML and get clean, indented JSON. Handles nested structures, arrays, and anchors. Also converts JSON → YAML.",
+                SeoTitle = "YAML to JSON Converter — Fileway",
+                SeoDescription = "Convert YAML to JSON instantly in your browser. Free, private, no upload required. Also converts JSON to YAML.",
+                Examples =
+                [
+                    new()
+                    {
+                        Label = "Service config",
+                        Input = """
+                            service:
+                              name: api-gateway
+                              version: "2.4.1"
+                              environment: production
+                              server:
+                                host: 0.0.0.0
+                                port: 8080
+                                tls:
+                                  enabled: true
+                                  cert: /etc/certs/server.crt
+                                  key: /etc/certs/server.key
+                              database:
+                                primary:
+                                  host: db-primary.internal
+                                  port: 5432
+                                  name: appdb
+                                  pool:
+                                    min: 5
+                                    max: 20
+                                    idle_timeout_ms: 30000
+                                replicas:
+                                  - host: db-replica-1.internal
+                                    port: 5432
+                                    weight: 70
+                                  - host: db-replica-2.internal
+                                    port: 5432
+                                    weight: 30
+                              logging:
+                                level: info
+                                format: json
+                                sinks:
+                                  - stdout
+                                  - datadog
+                            """
+                    },
+                    new()
+                    {
+                        Label = "GitHub Actions",
+                        Input = """
+                            name: CI
+                            on:
+                              push:
+                                branches: [main, "release/*"]
+                              pull_request:
+                                branches: [main]
+
+                            env:
+                              DOTNET_VERSION: "9.0"
+                              REGISTRY: ghcr.io
+
+                            jobs:
+                              test:
+                                runs-on: ubuntu-22.04
+                                timeout-minutes: 20
+                                steps:
+                                  - uses: actions/checkout@v4
+                                  - name: Setup .NET
+                                    uses: actions/setup-dotnet@v4
+                                    with:
+                                      dotnet-version: ${{ env.DOTNET_VERSION }}
+                                  - name: Restore
+                                    run: dotnet restore
+                                  - name: Build
+                                    run: dotnet build --no-restore -c Release
+                                  - name: Test
+                                    run: dotnet test --no-build -c Release
+
+                              publish:
+                                needs: test
+                                runs-on: ubuntu-22.04
+                                if: github.ref == 'refs/heads/main'
+                                steps:
+                                  - uses: actions/checkout@v4
+                                  - name: Build image
+                                    run: docker build -f docker/Dockerfile.api -t ${{ env.REGISTRY }}/myapp:${{ github.sha }} .
+                                  - name: Push image
+                                    run: docker push ${{ env.REGISTRY }}/myapp:${{ github.sha }}
+                            """
+                    }
+                ]
+            }
+        ],
         Examples =
         [
             new()
@@ -172,6 +270,48 @@ public static class DataTools
         SeoKeywords = ["json to csv", "csv to json", "json csv converter"],
         RelatedSlugs = ["json-to-yaml", "json-to-toml", "csv-to-xlsx", "validate"],
         SuggestionWeight = 80,
+        SlugAliases =
+        [
+            new()
+            {
+                Slug = "csv-to-json",
+                PresetOutputFormat = FileFormats.Json,
+                DisplayName = "CSV → JSON",
+                Description = "Convert CSV to a JSON array in your browser. Each row becomes an object with column headers as keys. Also converts JSON arrays → CSV.",
+                SeoTitle = "CSV to JSON Converter — Fileway",
+                SeoDescription = "Convert CSV to a JSON array instantly in your browser. Free, private, no upload required. Also converts JSON arrays to CSV.",
+                Examples =
+                [
+                    new()
+                    {
+                        Label = "Product catalog",
+                        Input = """
+                            sku,name,category,brand,price_usd,stock,weight_g,color,rating,reviews
+                            SKU-001,Wireless Headphones Pro,Audio,SoundMax,149.99,320,285,Midnight Black,4.7,2841
+                            SKU-002,Wireless Headphones Pro,Audio,SoundMax,149.99,180,285,Arctic White,4.7,1203
+                            SKU-003,Mechanical Keyboard TKL,Peripherals,TypeFast,89.99,540,820,Space Grey,4.5,983
+                            SKU-004,27" 4K Monitor,Displays,ClearVision,449.00,95,4200,Silver,4.8,412
+                            SKU-005,USB-C Hub 8-in-1,Accessories,ConnectPro,49.99,1200,145,Space Grey,4.3,3201
+                            SKU-006,Webcam 4K,Peripherals,ClearVision,129.99,430,320,Black,4.6,877
+                            SKU-007,Ergonomic Mouse,Peripherals,TypeFast,69.99,760,132,Graphite,4.4,1542
+                            SKU-008,Desk Lamp LED,Accessories,LuxDesk,39.99,890,680,White,4.2,2109
+                            """
+                    },
+                    new()
+                    {
+                        Label = "Incident log",
+                        Input = """
+                            incident_id,opened_at,resolved_at,severity,service,title,team,mttr_mins,root_cause,status
+                            INC-001,2026-03-15T09:12:00Z,2026-03-15T09:48:00Z,P2,api-gateway,Elevated 5xx rate on /v1/jobs,Platform,36,Memory leak in connection pool,resolved
+                            INC-002,2026-03-18T14:30:00Z,2026-03-18T16:05:00Z,P1,payment-service,Checkout payments failing,Payments,95,Third-party gateway timeout,resolved
+                            INC-003,2026-03-22T03:17:00Z,2026-03-22T04:02:00Z,P2,storage,R2 signed URL generation slow,Storage,45,Token rotation caused cold start,resolved
+                            INC-004,2026-04-01T11:00:00Z,,P3,worker,Background jobs delayed 15 min,Platform,,Queue backlog — consumer lag,investigating
+                            INC-005,2026-04-05T16:44:00Z,2026-04-05T17:21:00Z,P2,auth-service,Session validation errors,Auth,37,Expired cert not auto-rotated,resolved
+                            """
+                    }
+                ]
+            }
+        ],
         Examples =
         [
             new()
@@ -238,6 +378,104 @@ public static class DataTools
         SeoKeywords = ["json to toml", "toml to json", "json toml converter", "toml converter"],
         RelatedSlugs = ["json-to-yaml", "json-to-csv", "validate"],
         SuggestionWeight = 70,
+        SlugAliases =
+        [
+            new()
+            {
+                Slug = "toml-to-json",
+                PresetOutputFormat = FileFormats.Json,
+                DisplayName = "TOML → JSON",
+                Description = "Convert TOML to JSON in your browser. Useful for reading Cargo.toml, pyproject.toml, Hugo configs, and other TOML files as structured data. Also converts JSON → TOML.",
+                SeoTitle = "TOML to JSON Converter — Fileway",
+                SeoDescription = "Convert TOML to JSON instantly in your browser. Free, private, no upload required. Also converts JSON to TOML.",
+                Examples =
+                [
+                    new()
+                    {
+                        Label = "Cargo.toml",
+                        Input = """
+                            [package]
+                            name = "my-service"
+                            version = "1.0.0"
+                            edition = "2021"
+                            authors = ["alice@example.com", "bob@example.com"]
+                            description = "A fast async microservice"
+                            license = "MIT"
+
+                            [dependencies]
+                            tokio = { version = "1.37", features = ["full"] }
+                            serde = { version = "1.0", features = ["derive"] }
+                            serde_json = "1.0"
+                            axum = { version = "0.7", features = ["macros"] }
+                            sqlx = { version = "0.7", features = ["postgres", "runtime-tokio", "migrate", "uuid"] }
+                            tracing = "0.1"
+                            tracing-subscriber = { version = "0.3", features = ["json"] }
+                            anyhow = "1.0"
+
+                            [dev-dependencies]
+                            tokio = { version = "1.37", features = ["full", "test-util"] }
+                            mockall = "0.12"
+
+                            [profile.release]
+                            opt-level = 3
+                            lto = true
+                            codegen-units = 1
+                            strip = "symbols"
+                            panic = "abort"
+
+                            [profile.dev]
+                            opt-level = 0
+                            debug = true
+                            incremental = true
+                            """
+                    },
+                    new()
+                    {
+                        Label = "Hugo site config",
+                        Input = """
+                            baseURL = "https://example.com"
+                            title = "My Dev Blog"
+                            theme = "minimal"
+                            languageCode = "en-us"
+                            enableRobotsTXT = true
+                            enableGitInfo = true
+                            paginate = 10
+
+                            [params]
+                            author = "Alice Chen"
+                            description = "Writing about distributed systems and developer tools."
+                            showReadingTime = true
+                            showLastModified = true
+                            highlightTheme = "dracula"
+
+                            [outputs]
+                            home = ["HTML", "RSS", "JSON"]
+                            page = ["HTML"]
+                            section = ["HTML", "RSS"]
+
+                            [markup.highlight]
+                            style = "dracula"
+                            lineNos = true
+
+                            [[menu.main]]
+                            name = "Posts"
+                            url = "/posts/"
+                            weight = 1
+
+                            [[menu.main]]
+                            name = "Projects"
+                            url = "/projects/"
+                            weight = 2
+
+                            [[menu.main]]
+                            name = "About"
+                            url = "/about/"
+                            weight = 3
+                            """
+                    }
+                ]
+            }
+        ],
         Examples =
         [
             new()
