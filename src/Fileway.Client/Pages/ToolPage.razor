@@ -34,7 +34,7 @@ else
             {
                 <div class="tool-format-row">
                     <OutputFormatSelector
-                        OutputFormats="_tool.OutputFormats.ToArray()"
+                        OutputFormats="@_tool.OutputFormats.ToArray()"
                         SelectedFormat="_selectedOutputFormat"
                         OnFormatSelected="HandleFormatSelected" />
                 </div>
@@ -43,8 +43,8 @@ else
             @if (!_tool.RequiresFileInput)
             {
                 <InlineEditorPreview
-                    InputText="_inputText"
-                    OutputText="_outputText"
+                    InputText="@_inputText"
+                    OutputText="@_outputText"
                     DetectedFormat="_detectedInputFormat"
                     OutputFormat="_selectedOutputFormat"
                     IsConverting="_isConverting"
@@ -76,7 +76,7 @@ else
                     FallbackMessage="@ToolStateService.ErrorMessage"
                     IsRetryable="@ToolStateService.IsRetryable"
                     RetryAfterSeconds="@ToolStateService.RetryAfterSeconds"
-                    RelatedSlugs="_tool.RelatedSlugs.ToArray()"
+                    RelatedSlugs="@_tool.RelatedSlugs.ToArray()"
                     OnRetry="HandleRetry" />
             }
 
