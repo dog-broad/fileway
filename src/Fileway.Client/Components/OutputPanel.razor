@@ -58,19 +58,21 @@
     private async Task HandleDownload()
     {
         if (Result is null) return;
-
-        if (Result.DeliveryKind == DeliveryKind.Inline && Result.InlineContent is not null)
+        try
         {
-            var filename = OutputFormat is not null
-                ? $"output.{OutputFormat.Extensions[0]}"
-                : "output";
-            var mimeType = OutputFormat?.MimeTypes.FirstOrDefault() ?? "application/octet-stream";
-            await JS.InvokeVoidAsync("ClientInterop.downloadBase64", filename, mimeType, Result.InlineContent);
+            if (Result.DeliveryKind == DeliveryKind.Inline && Result.InlineContent is not null)
+            {
+                var ext = OutputFormat?.Extensions.Length > 0 ? OutputFormat.Extensions[0] : "bin";
+                var filename = $"output.{ext}";
+                var mimeType = OutputFormat?.MimeTypes.FirstOrDefault() ?? "application/octet-stream";
+                await JS.InvokeVoidAsync("ClientInterop.downloadBase64", filename, mimeType, Result.InlineContent);
+            }
+            else if (Result.DeliveryKind == DeliveryKind.SignedUrl && Result.SignedUrl is not null)
+            {
+                await JS.InvokeVoidAsync("window.open", Result.SignedUrl, "_blank");
+            }
         }
-        else if (Result.DeliveryKind == DeliveryKind.SignedUrl && Result.SignedUrl is not null)
-        {
-            await JS.InvokeVoidAsync("window.open", Result.SignedUrl, "_blank");
-        }
+        catch { }
     }
 
     private async Task HandleCopy()

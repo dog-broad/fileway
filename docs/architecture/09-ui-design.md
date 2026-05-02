@@ -92,11 +92,33 @@ Linear meets Vercel. Clean, precise, confident. Not playful, not corporate. Dark
 
 ---
 
+## Syntax Highlighting
+
+`SyntaxHighlightPreview.razor` uses **Prism.js** (self-hosted, no CDN) for all text-based formats that have a Prism grammar.
+
+| Format | Prism grammar | Highlighted |
+|---|---|---|
+| JSON | `language-json` | ✓ |
+| YAML | `language-yaml` | ✓ |
+| TOML | `language-toml` | ✓ |
+| CSV | none | plain pre-formatted text |
+
+**Loading:** `prism.min.js` (core + grammars concatenated, ~11 KB) loads in `<body>` before `blazor.webassembly.js`. `prism-theme.css` loads in `<head>`.
+
+**Theme:** Custom CSS in `wwwroot/css/prism-theme.css`. All token colours use `[data-theme="dark"]` / `[data-theme="light"]` selectors so they flip with the global theme toggle. No hex values — all colours chosen from the project's slate/green/amber/violet palette.
+
+**Triggering highlight:** `SyntaxHighlightPreview` calls `ClientInterop.highlightElement(el)` in `OnAfterRenderAsync` whenever the content changes. Prism reads `element.textContent`, tokenises it, and sets `element.innerHTML` with highlighted spans. Blazor re-renders overwrite the spans; `OnAfterRenderAsync` re-highlights after every such render.
+
+**Rule:** Any new text-format added to Fileway with a Prism grammar must have a `language-*` mapping in `SyntaxHighlightPreview.LangId`. Formats without a Prism grammar (CSV) render as unstyled monospace — acceptable.
+
+---
+
 ## Component Rules
 
 **Blazor CSS isolation:** Each component has its own `.razor.css` scoped file. No global style pollution.  
 **No hardcoded colours:** Every colour value is a CSS custom property. No hex values in component styles.  
-**No component library:** No MudBlazor, Radzen, or any third-party component CSS/JS.
+**No component library:** No MudBlazor, Radzen, or any third-party component CSS/JS.  
+**No CDN at runtime:** All JS and font assets are self-hosted in `wwwroot/`.
 
 ---
 

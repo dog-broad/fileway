@@ -1,4 +1,5 @@
 @using Fileway.Shared.Formats
+@inject IJSRuntime JS
 
 @if (!string.IsNullOrEmpty(Content))
 {
@@ -9,7 +10,7 @@
                 <span class="syntax-format-badge">@Format.DisplayName</span>
             }
         </div>
-        <pre class="syntax-pre @LangClass" tabindex="0"><code>@Content</code></pre>
+        <pre class="syntax-pre" tabindex="0"><code class="language-@LangId" @ref="_codeRef">@Content</code></pre>
     </div>
 }
 
@@ -17,12 +18,25 @@
     [Parameter] public string? Content { get; set; }
     [Parameter] public FileFormat? Format { get; set; }
 
-    private string LangClass => Format?.Id switch
+    private ElementReference _codeRef;
+    private string? _highlightedContent;
+
+    private string LangId => Format?.Id switch
     {
-        "json" => "lang-json",
-        "yaml" => "lang-yaml",
-        "csv"  => "lang-csv",
-        "toml" => "lang-toml",
+        "json" => "json",
+        "yaml" => "yaml",
+        "toml" => "toml",
         _      => string.Empty
     };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (string.IsNullOrEmpty(Content) || Content == _highlightedContent) return;
+        _highlightedContent = Content;
+        try
+        {
+            await JS.InvokeVoidAsync("ClientInterop.highlightElement", _codeRef);
+        }
+        catch { }
+    }
 }

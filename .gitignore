@@ -32,3 +32,6 @@ publish/
 # Docker env files
 *.env
 .env
+
+# Personal files
+*.temp
