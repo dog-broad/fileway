@@ -1,0 +1,38 @@
+@using Fileway.Shared.Tools
+
+<a href="/tools/@Tool.Slug" class="tool-card">
+    @if (Tool.Kind == ToolKind.Conversion)
+    {
+        <ConversionPair
+            InputFormat="@Tool.AcceptedFormats[0]"
+            OutputFormat="@(Tool.DefaultOutputFormat ?? Tool.OutputFormats[0])"
+            Size="BadgeSize.Md" />
+    }
+    else
+    {
+        <div class="tool-format-cluster">
+            @foreach (var fmt in Tool.AcceptedFormats.Take(4))
+            {
+                <FormatBadge Format="fmt" Size="BadgeSize.Sm" />
+            }
+        </div>
+    }
+    <div class="tool-card-header">
+        <span class="tool-card-name">@Tool.DisplayName</span>
+        <div class="tool-card-badges">
+            @if (Tool.IsNew)
+            {
+                <span class="badge badge-new">New</span>
+            }
+            @if (Tool.IsPopular)
+            {
+                <span class="badge badge-popular">Popular</span>
+            }
+        </div>
+    </div>
+    <p class="tool-card-description">@Tool.Description</p>
+</a>
+
+@code {
+    [Parameter, EditorRequired] public ToolDefinition Tool { get; set; } = null!;
+}

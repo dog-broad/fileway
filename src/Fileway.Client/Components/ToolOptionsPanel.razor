@@ -1,0 +1,65 @@
+@using Fileway.Shared.Tools
+
+@if (UiHints != UiHints.None)
+{
+    @if (UiHints.HasFlag(UiHints.ShowQualitySlider))
+    {
+        <QualitySlider
+            Value="_quality"
+            ValueChanged="v => _quality = v"
+            BeforeSizeBytes="InputSizeBytes"
+            AfterSizeBytes="OutputSizeBytes" />
+    }
+    @if (UiHints.HasFlag(UiHints.ShowDimensionInputs))
+    {
+        <DimensionInputs
+            Width="_width"
+            WidthChanged="v => _width = v"
+            Height="_height"
+            HeightChanged="v => _height = v"
+            LockAspectRatio="_lockAspectRatio"
+            LockAspectRatioChanged="v => _lockAspectRatio = v"
+            OriginalWidth="OriginalWidth"
+            OriginalHeight="OriginalHeight" />
+    }
+    @if (UiHints.HasFlag(UiHints.ShowPageSelector))
+    {
+        <p class="options-placeholder">Page selector (M3)</p>
+    }
+    @if (UiHints.HasFlag(UiHints.ShowOrderableList))
+    {
+        <p class="options-placeholder">Page editor (M3)</p>
+    }
+    @if (UiHints.HasFlag(UiHints.ShowSplitControls))
+    {
+        <p class="options-placeholder">Split controls (M3)</p>
+    }
+}
+
+@code {
+    [Parameter] public UiHints UiHints { get; set; } = UiHints.None;
+
+    // Size parameters for QualitySlider
+    [Parameter] public long? InputSizeBytes { get; set; }
+    [Parameter] public long? OutputSizeBytes { get; set; }
+
+    // Dimension parameters for DimensionInputs
+    [Parameter] public int? OriginalWidth { get; set; }
+    [Parameter] public int? OriginalHeight { get; set; }
+
+    // Callbacks so callers can read back values if needed
+    [Parameter] public EventCallback<int> OnQualityChanged { get; set; }
+    [Parameter] public EventCallback<(int? Width, int? Height)> OnDimensionsChanged { get; set; }
+
+    // Local state
+    private int _quality = 85;
+    private int? _width;
+    private int? _height;
+    private bool _lockAspectRatio = true;
+
+    // Expose current values for reading by parent pages (via ref or callbacks)
+    public int Quality => _quality;
+    public int? OutputWidth => _width;
+    public int? OutputHeight => _height;
+    public bool AspectRatioLocked => _lockAspectRatio;
+}

@@ -1,7 +1,57 @@
-﻿@page "/"
+@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Fileway — Any file. Any format. One way.</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="home-page">
+    <section class="hero">
+        <h1 class="hero-tagline">Any file. Any format.<br />One way.</h1>
+        <p class="hero-subtitle">Convert, validate, and transform files instantly in your browser. Private. No sign-up.</p>
+        <form class="hero-search" method="get" action="/tools">
+            <input type="search" name="q" class="hero-search-input"
+                   placeholder="Search tools…" aria-label="Search tools" />
+            <button type="submit" class="hero-search-btn" aria-label="Search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+            </button>
+        </form>
+    </section>
 
-Welcome to your new app.
+    <section class="categories" aria-label="Tool categories">
+        <h2 class="categories-title">Browse by category</h2>
+        <div class="category-grid">
+            <a href="/tools?category=Data" class="category-card">
+                <span class="category-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="1.5"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1"/>
+                        <path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1"/>
+                    </svg>
+                </span>
+                <div class="category-info">
+                    <span class="category-name">Data</span>
+                    <span class="category-desc">JSON, YAML, CSV, TOML converters and validators</span>
+                </div>
+            </a>
+            <a href="/tools?category=Image" class="category-card">
+                <span class="category-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="1.5"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                </span>
+                <div class="category-info">
+                    <span class="category-name">Image Tools</span>
+                    <span class="category-desc">Convert, resize, compress, and rotate images. Supports PNG, JPEG, WebP, GIF and more.</span>
+                </div>
+            </a>
+        </div>
+    </section>
+</div>

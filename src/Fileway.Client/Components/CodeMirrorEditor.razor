@@ -1,0 +1,72 @@
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div class="cm-host" @ref="_hostDiv"></div>
+
+@code {
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public string? Language { get; set; }
+    [Parameter] public string Placeholder { get; set; } = "";
+
+    private ElementReference _hostDiv;
+    private string? _editorId;
+    private string? _lastContent;
+    private string? _lastLanguage;
+    private DotNetObjectReference<CodeMirrorEditor>? _dotNetRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        _dotNetRef = DotNetObjectReference.Create(this);
+        _lastContent = Value ?? "";
+        _lastLanguage = Language ?? "";
+        try
+        {
+            _editorId = await JS.InvokeAsync<string>(
+                "FilewayEditor.create",
+                _hostDiv,
+                _lastLanguage,
+                _lastContent,
+                Placeholder,
+                _dotNetRef);
+        }
+        catch { }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_editorId is null) return;
+
+        if (Value != _lastContent)
+        {
+            _lastContent = Value;
+            try { await JS.InvokeVoidAsync("FilewayEditor.setContent", _editorId, Value ?? ""); }
+            catch { }
+        }
+
+        if (Language != _lastLanguage)
+        {
+            _lastLanguage = Language;
+            try { await JS.InvokeVoidAsync("FilewayEditor.setLanguage", _editorId, Language ?? ""); }
+            catch { }
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnContentChanged(string content)
+    {
+        _lastContent = content;
+        await ValueChanged.InvokeAsync(content);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_editorId is not null)
+        {
+            try { await JS.InvokeVoidAsync("FilewayEditor.destroy", _editorId); }
+            catch { }
+        }
+        _dotNetRef?.Dispose();
+    }
+}

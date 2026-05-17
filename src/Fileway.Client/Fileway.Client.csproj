@@ -9,6 +9,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" VersionOverride="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" VersionOverride="9.0.0" />
+    <PackageReference Include="YamlDotNet" />
+    <PackageReference Include="CsvHelper" />
+    <PackageReference Include="Tomlyn" />
+    <PackageReference Include="ClosedXML" />
+    <PackageReference Include="SixLabors.ImageSharp" />
   </ItemGroup>
 
   <ItemGroup>

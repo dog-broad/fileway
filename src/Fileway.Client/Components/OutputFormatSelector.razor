@@ -1,0 +1,27 @@
+@using Fileway.Shared.Formats
+
+@if (OutputFormats.Length > 1)
+{
+    <div class="format-selector" role="group" aria-label="Output format">
+        @foreach (var format in OutputFormats)
+        {
+            <button class="format-btn @(format.Id == SelectedFormat?.Id ? "active" : "")"
+                    @onclick="() => SelectFormat(format)"
+                    aria-pressed="@(format.Id == SelectedFormat?.Id)">
+                @format.DisplayName
+            </button>
+        }
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public FileFormat[] OutputFormats { get; set; } = [];
+    [Parameter] public FileFormat? SelectedFormat { get; set; }
+    [Parameter] public EventCallback<FileFormat> OnFormatSelected { get; set; }
+
+    private async Task SelectFormat(FileFormat format)
+    {
+        SelectedFormat = format;
+        await OnFormatSelected.InvokeAsync(format);
+    }
+}

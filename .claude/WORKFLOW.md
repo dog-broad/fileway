@@ -29,9 +29,31 @@ Before writing a single line of code:
 ## Working Through a Section
 
 - Complete one PROGRESS.md section at a time — do not start the next section until the current one is committed
-- Mark each checkbox `[x]` in PROGRESS.md as items are completed, before the commit
 - Only touch files that belong to the current section's scope; if a change is needed outside that scope, note it explicitly rather than silently folding it in
 - If an unexpected deviation from a SoT document is found mid-section, stop and follow the Deviation Protocol below before continuing
+
+### Checkbox State Convention
+
+PROGRESS.md checkboxes use three states to make progress traceable at a glance:
+
+| State | Meaning |
+|---|---|
+| `- [ ] Item description` | Not yet started |
+| `- [~] Item description` | In progress — work has begun but is not confirmed complete |
+| `- [x] Item description` | Complete — built, compiles, and verified |
+
+**When starting a section:** mark each item `[~]` as soon as active work begins on it.
+
+**When completing an item:** change `[~]` to `[x]` only after the item is built and confirmed working (build passes, or test passes if applicable). Never mark `[x]` speculatively.
+
+**Optional detail in brackets:** for items where the completion condition is non-obvious, add a short parenthetical after the description:
+
+```
+- [x] Add `FormatDetector` (magic bytes + ZIP disambiguation only — text heuristics in next step)
+- [~] Implement `JobDispatcher` (created JobRecord + dispatch loop; SSE writes pending)
+```
+
+This keeps the checklist honest and makes partial progress visible across sessions.
 
 ---
 
@@ -42,6 +64,8 @@ Before writing a single line of code:
 1. Run `git status` to show all changed files
 2. Stage only the files relevant to the completed section — provide explicit `git add <file>` commands, never `git add .` or `git add -A`
 3. Provide the exact `git commit -m "..."` command ready to copy-paste
+
+**Never add a `Co-Authored-By` trailer** to commit messages. Commit authorship belongs to the developer only.
 
 ### Commit Message Format
 
@@ -82,6 +106,30 @@ docs(progress): mark shared-types section complete
 ```
 
 **Never include** milestone labels (M1, M2…), phase numbers, or "implement milestone X" anywhere in the message.
+
+---
+
+## Checkpoint Protocol
+
+Each PROGRESS.md section ends with a `**Checkpoint**` item. No section commit is provided until its checkpoint passes.
+
+### How to handle a checkpoint
+
+**If Claude can run it directly** (e.g. `curl`, `dotnet test`, `grep`, file existence checks, `docker` commands):
+- Run it, show the output, confirm it passes before moving on
+
+**If it requires a browser or manual action** (DevTools inspection, drag interactions, visual confirmation):
+- State clearly what the developer needs to do and what a passing result looks like
+- Wait for confirmation before marking the checkpoint `[x]` or providing the commit command
+
+**If a checkpoint fails:**
+- Stop — do not provide a commit command for a section whose checkpoint did not pass
+- Fix the failing issue as a `fix(<scope>)` change bundled into the same section commit (not a separate commit) if the section is otherwise complete
+- Re-run the checkpoint after fixing; only then provide the commit command
+
+**Marking state:**
+- Mark the checkpoint `[~]` while it is being verified
+- Mark it `[x]` only after it passes — never speculatively
 
 ---
 

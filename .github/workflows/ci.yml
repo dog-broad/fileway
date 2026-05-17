@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ "**" ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -11,7 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
@@ -21,27 +24,22 @@ jobs:
       - name: Install WASM workload
         run: dotnet workload install wasm-tools
 
-      - name: Install LibreOffice
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            libreoffice-nogui fonts-liberation fonts-dejavu libfontconfig1
-
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore Fileway.sln
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build Fileway.sln -c Release --no-restore -p:TreatWarningsAsErrors=true
 
-      - name: Test
+      - name: Test with coverage
         run: |
-          dotnet test --no-build --configuration Release \
+          dotnet test Fileway.sln -c Release --no-restore --no-build \
             --collect:"XPlat Code Coverage" \
-            --results-directory TestResults
+            --results-directory ./coverage \
+            --logger "trx"
 
-      - name: Upload coverage
+      - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: coverage-results
-          path: TestResults/
+          name: coverage-report
+          path: ./coverage

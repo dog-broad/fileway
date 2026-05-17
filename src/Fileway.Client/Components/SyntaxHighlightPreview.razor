@@ -1,0 +1,42 @@
+@using Fileway.Shared.Formats
+@inject IJSRuntime JS
+
+@if (!string.IsNullOrEmpty(Content))
+{
+    <div class="syntax-preview">
+        <div class="syntax-preview-header">
+            @if (Format is not null)
+            {
+                <span class="syntax-format-badge">@Format.DisplayName</span>
+            }
+        </div>
+        <pre class="syntax-pre" tabindex="0"><code class="language-@LangId" @ref="_codeRef">@Content</code></pre>
+    </div>
+}
+
+@code {
+    [Parameter] public string? Content { get; set; }
+    [Parameter] public FileFormat? Format { get; set; }
+
+    private ElementReference _codeRef;
+    private string? _highlightedContent;
+
+    private string LangId => Format?.Id switch
+    {
+        "json" => "json",
+        "yaml" => "yaml",
+        "toml" => "toml",
+        _      => string.Empty
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (string.IsNullOrEmpty(Content) || Content == _highlightedContent) return;
+        _highlightedContent = Content;
+        try
+        {
+            await JS.InvokeVoidAsync("ClientInterop.highlightElement", _codeRef);
+        }
+        catch { }
+    }
+}

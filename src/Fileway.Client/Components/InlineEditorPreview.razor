@@ -1,0 +1,116 @@
+@using Fileway.Shared.Formats
+@using Fileway.Shared.Tools
+
+<div class="inline-editor">
+    <div class="inline-editor-pane">
+        <div class="pane-header">
+            <span class="pane-label">Input</span>
+            @if (DetectedFormat is not null)
+            {
+                <FormatBadge Format="DetectedFormat" Size="BadgeSize.Sm" />
+            }
+            @if (Examples is { Length: > 0 })
+            {
+                <div class="example-chips">
+                    @foreach (var example in Examples)
+                    {
+                        var ex = example;
+                        <button class="example-chip"
+                                @onclick="() => LoadExample(ex)"
+                                title="Load @ex.Label example">
+                            @ex.Label
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+        <CodeMirrorEditor
+            Value="@InputText"
+            ValueChanged="HandleInput"
+            Language="@(DetectedFormat?.Id ?? "")"
+            Placeholder="@Placeholder" />
+    </div>
+
+    <div class="inline-editor-divider" aria-hidden="true">
+        <button class="convert-btn"
+                @onclick="HandleConvert"
+                disabled="@(IsConverting || string.IsNullOrWhiteSpace(InputText))"
+                title="Convert"
+                aria-label="Convert">
+            @if (IsConverting)
+            {
+                <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                    <line x1="12" y1="2" x2="12" y2="6"/>
+                    <line x1="12" y1="18" x2="12" y2="22"/>
+                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/>
+                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+                    <line x1="2" y1="12" x2="6" y2="12"/>
+                    <line x1="18" y1="12" x2="22" y2="12"/>
+                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/>
+                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+                </svg>
+            }
+            else
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <polyline points="12 5 19 12 12 19"/>
+                </svg>
+            }
+        </button>
+    </div>
+
+    <div class="inline-editor-pane">
+        <div class="pane-header">
+            <span class="pane-label">Output</span>
+            @if (OutputFormat is not null)
+            {
+                <FormatBadge Format="OutputFormat" Size="BadgeSize.Sm" />
+            }
+        </div>
+        <div class="pane-output">
+            @if (!string.IsNullOrEmpty(OutputText))
+            {
+                <SyntaxHighlightPreview Content="@OutputText" Format="@OutputFormat" />
+            }
+            else
+            {
+                <p class="output-placeholder">Output will appear here</p>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? InputText { get; set; }
+    [Parameter] public EventCallback<string> OnInputChanged { get; set; }
+    [Parameter] public EventCallback<string> OnConvert { get; set; }
+    [Parameter] public string? OutputText { get; set; }
+    [Parameter] public FileFormat? DetectedFormat { get; set; }
+    [Parameter] public FileFormat? OutputFormat { get; set; }
+    [Parameter] public bool IsConverting { get; set; }
+    [Parameter] public string Placeholder { get; set; } = "Paste or type your content here…";
+    [Parameter] public ToolExample[]? Examples { get; set; }
+
+    private async Task HandleInput(string text)
+    {
+        await OnInputChanged.InvokeAsync(text);
+    }
+
+    private async Task HandleConvert()
+    {
+        if (!string.IsNullOrWhiteSpace(InputText))
+            await OnConvert.InvokeAsync(InputText);
+    }
+
+    private async Task LoadExample(ToolExample example)
+    {
+        var trimmed = example.Input.Trim();
+        await OnInputChanged.InvokeAsync(trimmed);
+        await OnConvert.InvokeAsync(trimmed);
+    }
+}

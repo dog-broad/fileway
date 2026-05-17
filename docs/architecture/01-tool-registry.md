@@ -104,6 +104,67 @@ The tool registry is the single source of truth for every tool in the app. Every
 | `RelatedSlugs` | `string[]` | "Also try" panel after conversion. Order matters. |
 | `SuggestionWeight` | `int` | Detection-driven suggestions. Higher = shown first. |
 
+### Alias Slugs
+
+| Field | Type | Notes |
+|---|---|---|
+| `SlugAliases` | `ToolSlugAlias[]` | Not required. Default is empty. Reverse-direction URLs for bidirectional tools. |
+
+**`ToolSlugAlias` record** (`Fileway.Shared/Tools/ToolSlugAlias.cs`):
+
+| Field | Type | Notes |
+|---|---|---|
+| `Slug` | `string` | The alias URL: `yaml-to-json`, `csv-to-json`, `toml-to-json`. Stable — never change after first publish. |
+| `PresetOutputFormat` | `FileFormat` | Pre-selected output format when the page loads via this slug. |
+| `DisplayName` | `string` | Shown as page title when loaded via alias: `YAML → JSON`. |
+| `Description` | `string` | Tool description copy for the alias direction. |
+| `SeoTitle` | `string` | `<title>` for the alias URL. |
+| `SeoDescription` | `string` | Meta description for the alias URL. |
+| `Examples` | `ToolExample[]` | Examples appropriate for this direction (e.g. YAML input when on `yaml-to-json`). |
+
+**How it works:**
+- `ToolRegistry.GetBySlug(slug)` resolves both canonical slugs and alias slugs, returning the canonical `ToolDefinition`.
+- `ToolRegistry.GetAlias(slug)` returns the `ToolSlugAlias` if the slug is an alias; null if canonical.
+- `ToolPage` calls both. If an alias is active, it applies `PresetOutputFormat`, `DisplayName`, `Description`, and `Examples` from the alias. The output format selector is still shown so the user can switch directions manually.
+- `GetSitemapEntries()` includes alias slugs as separate entries with their own SEO fields.
+- `ValidateSlug` accepts both canonical and alias slugs.
+
+**Which tools have aliases (M1):**
+
+| Canonical slug | Alias slug | Preset output |
+|---|---|---|
+| `json-to-yaml` | `yaml-to-json` | JSON |
+| `json-to-csv` | `csv-to-json` | JSON |
+| `json-to-toml` | `toml-to-json` | JSON |
+
+**Rules:**
+- Only bidirectional tools get aliases. One-way tools (`csv-to-xlsx`) do not.
+- Each alias must supply its own `Examples` covering the reverse direction's typical input format.
+- Alias slugs follow the same naming convention: `{source}-to-{target}`.
+- Alias slugs are stable URLs — treat them the same as canonical slugs once published.
+
+### Examples
+
+| Field | Type | Notes |
+|---|---|---|
+| `Examples` | `ToolExample[]` | Not required. Default is empty. Only relevant for `RequiresFileInput = false` tools. |
+
+**`ToolExample` record** (`Fileway.Shared/Tools/ToolExample.cs`):
+
+| Field | Type | Notes |
+|---|---|---|
+| `Label` | `string` | Short name shown on the chip: "Service config", "Sales orders". Max ~20 chars. |
+| `Input` | `string` | The full example text. Should be realistic — non-trivial nesting and field variety. |
+
+Examples appear as chips in the input pane header. Clicking one loads the content into the editor and triggers conversion immediately, giving users a live before/after demo without typing anything.
+
+**Rules:**
+- Examples must be valid input for the tool — they will auto-convert on click.
+- For bidirectional tools (JSON↔YAML, JSON↔CSV), supply examples in the primary input format (the `DefaultOutputFormat`'s counterpart).
+- For `json-to-csv`, examples **must** be flat JSON arrays — nested objects will hit `JsonNotCsvCompatible`.
+- Target 2 examples per tool. One domain (configs, ops) + one data (records, events) is the pattern.
+- Every new `RequiresFileInput = false` tool added to the registry must include at least one example.
+
 ---
 
 ## Enums

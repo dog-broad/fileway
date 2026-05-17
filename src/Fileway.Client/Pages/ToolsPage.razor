@@ -1,0 +1,83 @@
+@page "/tools"
+@inject IToolRegistry ToolRegistry
+@inject NavigationManager Nav
+
+<PageTitle>Tools — Fileway</PageTitle>
+
+<div class="tools-page">
+    <header class="tools-header">
+        <h1 class="tools-title">Tools</h1>
+        <div class="tools-search-wrap">
+            <input type="search"
+                   class="tools-search-input"
+                   placeholder="Search tools…"
+                   value="@_query"
+                   @oninput="HandleSearch"
+                   aria-label="Search tools" />
+        </div>
+    </header>
+
+    @if (_filteredTools.Count == 0)
+    {
+        <p class="no-results">No tools match "<em>@_query</em>".</p>
+    }
+    else
+    {
+        @foreach (var group in _groupedTools)
+        {
+            <section class="tool-group" aria-labelledby="@($"group-{group.Key.ToString().ToLower()}")">
+                <h2 class="tool-group-title" id="@($"group-{group.Key.ToString().ToLower()}")">
+                    @group.Key
+                </h2>
+                <div class="tool-grid">
+                    @foreach (var tool in group)
+                    {
+                        <ToolCard Tool="tool" />
+                    }
+                </div>
+            </section>
+        }
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "q")] public string? Q { get; set; }
+    [SupplyParameterFromQuery(Name = "category")] public string? Category { get; set; }
+
+    private string _query = string.Empty;
+    private List<ToolDefinition> _filteredTools = [];
+    private IEnumerable<IGrouping<ToolCategory, ToolDefinition>> _groupedTools = [];
+
+    protected override void OnParametersSet()
+    {
+        _query = Q ?? string.Empty;
+        ApplyFilter();
+    }
+
+    private void HandleSearch(ChangeEventArgs e)
+    {
+        _query = e.Value?.ToString() ?? string.Empty;
+        ApplyFilter();
+        Nav.NavigateTo($"/tools?q={Uri.EscapeDataString(_query)}", replace: true);
+    }
+
+    private void ApplyFilter()
+    {
+        IEnumerable<ToolDefinition> tools = ToolRegistry.GetAll();
+
+        if (!string.IsNullOrWhiteSpace(Category) &&
+            Enum.TryParse<ToolCategory>(Category, ignoreCase: true, out var cat))
+        {
+            tools = tools.Where(t => t.Category == cat);
+        }
+
+        if (!string.IsNullOrWhiteSpace(_query))
+        {
+            tools = ToolRegistry.Search(_query)
+                .Where(t => !Enum.TryParse<ToolCategory>(Category, ignoreCase: true, out var c) || t.Category == c);
+        }
+
+        _filteredTools = tools.ToList();
+        _groupedTools = _filteredTools.GroupBy(t => t.Category);
+    }
+}
