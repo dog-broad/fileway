@@ -1,0 +1,4 @@
+[package]
+name = "test"
+value = 42
+active = true

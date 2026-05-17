@@ -19,12 +19,9 @@ var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? builder.HostEnvironment.
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
 
 // --- Shared singletons ---
-builder.Services.AddSingleton<IFormatDetector>(_ => new FormatDetector([
-    FileFormats.Json, FileFormats.Yaml, FileFormats.Csv, FileFormats.Toml,
-    FileFormats.Xlsx, FileFormats.Txt, FileFormats.Md
-]));
+builder.Services.AddSingleton<IFormatDetector>(_ => new FormatDetector(FileFormats.All));
 
-builder.Services.AddSingleton<IToolRegistry>(_ => new ToolRegistry(DataTools.All));
+builder.Services.AddSingleton<IToolRegistry>(_ => new ToolRegistry([.. DataTools.All, .. ImageTools.All]));
 
 // --- Session token (singleton — one token per tab lifetime) ---
 builder.Services.AddSingleton<SessionTokenProvider>();

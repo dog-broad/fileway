@@ -1,0 +1,143 @@
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div class="sbs-container" @ref="_containerRef">
+
+    @if (BeforeBytes is not null)
+    {
+        var beforeDataUri = $"data:{_beforeMimeType};base64,{Convert.ToBase64String(BeforeBytes)}";
+
+        @if (AfterBytes is not null)
+        {
+            var afterDataUri = $"data:{_afterMimeType};base64,{Convert.ToBase64String(AfterBytes)}";
+
+            @* Split view — clip before image on left, show after image on right *@
+            <div class="sbs-before-side" style="clip-path: inset(0 @(100 - _dividerPosition)% 0 0)">
+                <div class="sbs-label sbs-label--before" aria-hidden="true">Before</div>
+                <img class="sbs-image" src="@beforeDataUri" alt="Before conversion" draggable="false" />
+            </div>
+
+            <div class="sbs-after-side">
+                <div class="sbs-label sbs-label--after" aria-hidden="true">After</div>
+                <img class="sbs-image" src="@afterDataUri" alt="After conversion" draggable="false" />
+            </div>
+
+            <div class="sbs-divider" style="left: @(_dividerPosition.ToString("F2", System.Globalization.CultureInfo.InvariantCulture))%"
+                 tabindex="0"
+                 role="slider"
+                 aria-label="Comparison divider — use arrow keys to move"
+                 aria-valuemin="0"
+                 aria-valuemax="100"
+                 aria-valuenow="@((int)_dividerPosition)"
+                 @onkeydown="HandleKeyDown"
+                 @onkeydown:preventDefault="@_preventDefaultKey">
+                <div class="sbs-divider-line"></div>
+                <div class="sbs-divider-handle" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </div>
+            </div>
+        }
+        else
+        {
+            @* Before only — show single image with overlay *@
+            <div class="sbs-single">
+                <img class="sbs-image" src="@beforeDataUri" alt="Input image" draggable="false" />
+                <div class="sbs-overlay" role="status" aria-live="polite">
+                    <span class="sbs-overlay-text">Convert to see result</span>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="sbs-empty" role="status">
+            <span class="sbs-empty-text">Drop a file to preview</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public byte[]? BeforeBytes { get; set; }
+    [Parameter] public byte[]? AfterBytes { get; set; }
+    [Parameter] public string? OutputMimeType { get; set; }
+    [Parameter] public string? BeforeMimeType { get; set; }
+
+    private double _dividerPosition = 50.0;
+    private ElementReference _containerRef;
+    private bool _preventDefaultKey;
+    private DotNetObjectReference<SideBySideImagePreview>? _selfRef;
+
+    private string _beforeMimeType => BeforeMimeType ?? "image/png";
+    private string _afterMimeType => OutputMimeType ?? "image/png";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && AfterBytes is not null)
+        {
+            _selfRef = DotNetObjectReference.Create(this);
+            try
+            {
+                await JS.InvokeVoidAsync("SideBySideInterop.init", _containerRef, _selfRef);
+            }
+            catch { }
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // When AfterBytes appears for first time, re-init interop
+        if (AfterBytes is not null && _selfRef is null)
+        {
+            _selfRef = DotNetObjectReference.Create(this);
+            try
+            {
+                await JS.InvokeVoidAsync("SideBySideInterop.init", _containerRef, _selfRef);
+            }
+            catch { }
+        }
+    }
+
+    [JSInvokable]
+    public void SetDividerPosition(double percent)
+    {
+        _dividerPosition = Math.Clamp(percent, 0, 100);
+        StateHasChanged();
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        _preventDefaultKey = e.Key is "ArrowLeft" or "ArrowRight" or "Home" or "End";
+        switch (e.Key)
+        {
+            case "ArrowLeft":
+                _dividerPosition = Math.Max(0, _dividerPosition - 5);
+                break;
+            case "ArrowRight":
+                _dividerPosition = Math.Min(100, _dividerPosition + 5);
+                break;
+            case "Home":
+                _dividerPosition = 0;
+                break;
+            case "End":
+                _dividerPosition = 100;
+                break;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("SideBySideInterop.destroy", _containerRef);
+        }
+        catch { }
+        _selfRef?.Dispose();
+    }
+}

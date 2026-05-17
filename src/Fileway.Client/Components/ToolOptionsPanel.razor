@@ -1,16 +1,26 @@
 @using Fileway.Shared.Tools
 
-@* M1: all data tools have UiHints.None — nothing to render.
-   Future milestones add sub-components here keyed on UiHints flags. *@
 @if (UiHints != UiHints.None)
 {
     @if (UiHints.HasFlag(UiHints.ShowQualitySlider))
     {
-        <p class="options-placeholder">Quality slider (M2)</p>
+        <QualitySlider
+            Value="_quality"
+            ValueChanged="v => _quality = v"
+            BeforeSizeBytes="InputSizeBytes"
+            AfterSizeBytes="OutputSizeBytes" />
     }
     @if (UiHints.HasFlag(UiHints.ShowDimensionInputs))
     {
-        <p class="options-placeholder">Dimension inputs (M2)</p>
+        <DimensionInputs
+            Width="_width"
+            WidthChanged="v => _width = v"
+            Height="_height"
+            HeightChanged="v => _height = v"
+            LockAspectRatio="_lockAspectRatio"
+            LockAspectRatioChanged="v => _lockAspectRatio = v"
+            OriginalWidth="OriginalWidth"
+            OriginalHeight="OriginalHeight" />
     }
     @if (UiHints.HasFlag(UiHints.ShowPageSelector))
     {
@@ -28,4 +38,28 @@
 
 @code {
     [Parameter] public UiHints UiHints { get; set; } = UiHints.None;
+
+    // Size parameters for QualitySlider
+    [Parameter] public long? InputSizeBytes { get; set; }
+    [Parameter] public long? OutputSizeBytes { get; set; }
+
+    // Dimension parameters for DimensionInputs
+    [Parameter] public int? OriginalWidth { get; set; }
+    [Parameter] public int? OriginalHeight { get; set; }
+
+    // Callbacks so callers can read back values if needed
+    [Parameter] public EventCallback<int> OnQualityChanged { get; set; }
+    [Parameter] public EventCallback<(int? Width, int? Height)> OnDimensionsChanged { get; set; }
+
+    // Local state
+    private int _quality = 85;
+    private int? _width;
+    private int? _height;
+    private bool _lockAspectRatio = true;
+
+    // Expose current values for reading by parent pages (via ref or callbacks)
+    public int Quality => _quality;
+    public int? OutputWidth => _width;
+    public int? OutputHeight => _height;
+    public bool AspectRatioLocked => _lockAspectRatio;
 }

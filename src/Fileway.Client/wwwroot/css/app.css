@@ -87,6 +87,8 @@
     --format-gif-fg:   #e879f9;
     --format-svg-bg:   rgba(129, 140, 248, 0.12);
     --format-svg-fg:   #818cf8;
+    --format-bmp-bg:   rgba(148, 163, 184, 0.12);
+    --format-bmp-fg:   #94a3b8;
     --format-pdf-bg:   rgba(248, 113, 113, 0.12);
     --format-pdf-fg:   #f87171;
     --format-docx-bg:  rgba(96,  165, 250, 0.12);
@@ -146,6 +148,8 @@
     --format-gif-fg:   #c026d3;
     --format-svg-bg:   rgba(79,  70,  229, 0.09);
     --format-svg-fg:   #4f46e5;
+    --format-bmp-bg:   rgba(100, 116, 139, 0.09);
+    --format-bmp-fg:   #64748b;
     --format-pdf-bg:   rgba(220, 38,  38,  0.09);
     --format-pdf-fg:   #dc2626;
     --format-docx-bg:  rgba(37,  99,  235, 0.09);

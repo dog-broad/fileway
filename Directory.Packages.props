@@ -13,7 +13,7 @@
     <PackageVersion Include="Docnet.netstandard" Version="2.6.0" />
 
     <!-- Images -->
-    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.5" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageVersion Include="Svg.Skia" Version="1.0.0.21" />
 
     <!-- Data formats -->

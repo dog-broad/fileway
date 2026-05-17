@@ -55,12 +55,9 @@ try
     // --- Infrastructure ---
     builder.Services.AddSingleton<ITierResolver, AlwaysFreeTierResolver>();
 
-    builder.Services.AddSingleton<IFormatDetector>(_ => new FormatDetector([
-        FileFormats.Json, FileFormats.Yaml, FileFormats.Csv, FileFormats.Toml,
-        FileFormats.Xlsx, FileFormats.Txt, FileFormats.Md
-    ]));
+    builder.Services.AddSingleton<IFormatDetector>(_ => new FormatDetector(FileFormats.All));
 
-    builder.Services.AddSingleton<IToolRegistry>(_ => new ToolRegistry(DataTools.All));
+    builder.Services.AddSingleton<IToolRegistry>(_ => new ToolRegistry([.. DataTools.All, .. ImageTools.All]));
 
     // --- Job model + storage ---
     builder.Services.AddSingleton<IJobStore, InMemoryJobStore>();
@@ -155,3 +152,6 @@ finally
 {
     Log.CloseAndFlush();
 }
+
+// Required by WebApplicationFactory<Program> in integration tests
+public partial class Program { }

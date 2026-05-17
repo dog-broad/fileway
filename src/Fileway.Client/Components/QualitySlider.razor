@@ -1,0 +1,71 @@
+<div class="quality-slider">
+    <div class="quality-slider-header">
+        <label class="quality-label" for="quality-range">Quality</label>
+        <span class="quality-value" aria-hidden="true">@Value</span>
+    </div>
+
+    <input id="quality-range"
+           type="range"
+           class="quality-range"
+           min="1"
+           max="100"
+           value="@Value"
+           @onchange="HandleChange"
+           aria-label="Quality"
+           aria-valuemin="1"
+           aria-valuemax="100"
+           aria-valuenow="@Value" />
+
+    @if (BeforeSizeBytes.HasValue && AfterSizeBytes.HasValue && BeforeSizeBytes.Value > 0)
+    {
+        var reduction = (1.0 - (double)AfterSizeBytes.Value / BeforeSizeBytes.Value) * 100.0;
+
+        <div class="quality-size-comparison" aria-live="polite">
+            <span class="quality-size-before">@FormatSize(BeforeSizeBytes.Value)</span>
+            <svg class="quality-size-arrow" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+            </svg>
+            <span class="quality-size-after">@FormatSize(AfterSizeBytes.Value)</span>
+            @if (reduction > 0)
+            {
+                <span class="quality-size-reduction">(@reduction.ToString("F0")% smaller)</span>
+            }
+            else if (reduction < 0)
+            {
+                <span class="quality-size-increase">(@(Math.Abs(reduction).ToString("F0"))% larger)</span>
+            }
+        </div>
+    }
+    else if (BeforeSizeBytes.HasValue)
+    {
+        <div class="quality-size-before-only">
+            <span class="quality-size-label">Input size:</span>
+            <span class="quality-size-value">@FormatSize(BeforeSizeBytes.Value)</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int Value { get; set; } = 85;
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+    [Parameter] public long? BeforeSizeBytes { get; set; }
+    [Parameter] public long? AfterSizeBytes { get; set; }
+
+    private async Task HandleChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var v))
+        {
+            await ValueChanged.InvokeAsync(Math.Clamp(v, 1, 100));
+        }
+    }
+
+    private static string FormatSize(long bytes)
+    {
+        if (bytes < 1024) return $"{bytes} B";
+        if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
+        return $"{bytes / (1024.0 * 1024):F1} MB";
+    }
+}

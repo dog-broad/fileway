@@ -9,13 +9,19 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NSubstitute" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="FluentAssertions" />
+    <Using Include="Fileway.Shared.Processors" />
+    <Using Include="Fileway.Shared.Formats" />
+    <Using Include="Fileway.Shared.Errors" />
   </ItemGroup>
 
   <ItemGroup>
