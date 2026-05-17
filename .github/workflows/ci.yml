@@ -35,7 +35,7 @@ jobs:
           dotnet test Fileway.sln -c Release --no-restore --no-build \
             --collect:"XPlat Code Coverage" \
             --results-directory ./coverage \
-            --logger "github"
+            --logger "trx"
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
